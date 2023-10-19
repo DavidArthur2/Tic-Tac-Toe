@@ -6,8 +6,8 @@ class colors:
     ERROR = '\033[91m'
 def sendError(header,raw_message,level=1):
     #Message - üzenet, Level - fokozat: 0 warning, 1 error, 2 error kilépéssel
-
-    msg = f"[{datetime.date.today()} {datetime.datetime.now()}] {header} : {raw_message}\n"
+    time_format = datetime.datetime.now().strftime("%H:%M:%S")
+    msg = f"[{datetime.date.today()} {time_format}] {header} : {raw_message}\n"
 
     if level in [1,2]:
         curr_color=colors.ERROR
@@ -24,5 +24,3 @@ def sendError(header,raw_message,level=1):
         print("Error in error.py: Cannot write to file!")
 
     #Kilépés később következik
-
-sendError("asd","asd")
