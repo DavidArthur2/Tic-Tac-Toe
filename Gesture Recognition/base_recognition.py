@@ -1,14 +1,15 @@
+import profile
+
 import cv2  # Képfeldolgozásra használt könyvtár
 import mediapipe as mp  # Képfelismerésre használt könyvtár -- Tartalmazza a TensorFlowot
-from utils.error import sendError
-from gesture_recognition import calcResult
+from utils.error import *
+from gesture_recognition import recognize_gesture
 import threading
-from memory_profiler import profile
+from recognition_utils import *
 
 # Default variables
-mp_hands = mp.solutions.hands  # Hasznalt class a kezfelismeresre
-mp_drawing = mp.solutions.drawing_utils  # Hasznalt class a kezrajzolasra
 hands_detector = None # A kepfelismero
+
 
 cam = None
 
@@ -30,6 +31,7 @@ def initialize_camera():
         return False
     return True
 
+
 def capture_frame():
 
     while cam.isOpened():
@@ -42,35 +44,33 @@ def capture_frame():
 
         process_frame(frame)
 
-        if cv2.waitKey(5) & 0xFF == ord("q"):
-            break
 
-@profile
 def process_frame(frame):
     cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     rec_img = hands_detector.process(frame)
 
-    if (rec_img.multi_hand_landmarks):
+    if rec_img.multi_hand_landmarks:
         hand_landmarks = rec_img.multi_hand_landmarks[0]
-        mp_drawing.draw_landmarks(frame, hand_landmarks, connections=mp_hands.HAND_CONNECTIONS)
-        # calcResult(hand_landmarks)
-
-
+        gesture = recognize_gesture(hand_landmarks,frame)
+        print(gesture)
 
     cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-    cv2.imshow("Kep", frame)
+    cv2.resize(frame,(480,640))
+    #cv2.imshow("Kep", frame)
 
-@profile
+
 def operate_recognition():
     global hands_detector
 
     if not initialize_camera():
         return
 
+    #Initialize recognizer
     hands_detector = mp_hands.Hands(max_num_hands=1, min_detection_confidence=detection_confidence,min_tracking_confidence=tracking_confidence)
     capture_frame()
 
+    #Release resources
     hands_detector.close()
     cam.release()
     cv2.destroyAllWindows()

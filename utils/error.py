@@ -14,7 +14,7 @@ def sendError(header,raw_message,level=1):
     else:
         curr_color=colors.WARNING
 
-    print(f'{curr_color}{header}: {raw_message}\n')
+    print(f'{curr_color}{header}\n')
 
     try:
         log_file = open("../log.txt", "a")
