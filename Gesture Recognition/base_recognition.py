@@ -11,6 +11,7 @@ from recognition_utils import *
 hands_detector = None  # A kepfelismero
 stop_program = False
 
+
 cam = None
 
 detection_confidence = 0.5
@@ -29,6 +30,9 @@ def initialize_camera():
     if not result:
         sendError("Hiba a kamera megnyitásánál", "Nem található a kiválasztott kamera, vagy nem lehet megnyitni!")
         return False
+
+    h, w, _ = o.shape  # Getting the default frame sizes of the camera
+    set_cam_size(h, w)
     return True
 
 
@@ -49,6 +53,7 @@ def process_frame(frame):
 
     try:
         cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.flip(frame, 1)  # Mirroring the camera
 
         rec_img = hands_detector.process(frame)
 
@@ -58,7 +63,8 @@ def process_frame(frame):
             print(gesture)
 
         cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        cv2.resize(frame, (480, 640))
+        # h, w = get_cam_size()
+        # cv2.resize(frame, (w, h))
         cv2.imshow("Kep", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
