@@ -102,5 +102,3 @@ def operate_recognition():
     # Release resources
     stop_recognition()
 
-
-threading.Thread(target=operate_recognition).start()
