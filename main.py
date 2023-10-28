@@ -1,6 +1,6 @@
 
 def print_hi(name):
-    print(f'Ez a gest_detection branch {name}')
+    print(f'Ez a gest_detection branch készen{name}')
 
 
 
