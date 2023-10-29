@@ -1,6 +1,7 @@
 import PySimpleGUI as psg
 import cv2
 
+
 bgclr = 'light blue'
 camera_index = 0
 
@@ -248,13 +249,29 @@ def sixthpage():
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    b1 = psg.Button('Same PC', size=(30, 3))
-    space1 = psg.Text('', size=(30, 5), background_color=bgclr)
+    b1 = psg.Button('', size=(15, 6), key='-1-')
+    b2 = psg.Button('', size=(15, 6), key='-2-')
+    b3 = psg.Button('', size=(15, 6), key='-3-')
+    b4 = psg.Button('', size=(15, 6), key='-4-')
+    b5 = psg.Button('', size=(15, 6), key='-5-')
+    b6 = psg.Button('', size=(15, 6), key='-6-')
+    b7 = psg.Button('', size=(15, 6), key='-7-')
+    b8 = psg.Button('', size=(15, 6), key='-8-')
+    b9 = psg.Button('', size=(15, 6), key='-9-')
+    space1 = psg.Text('', size=(30, 3), background_color=bgclr)
     col1 = [[text1]]
-    layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3]
+    col2 = [[b1], [b4], [b7]]
+    col3 = [[b2], [b5], [b8]]
+    col4 = [[b3], [b6], [b9]]
+    layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
+              [space1],
+              [psg.Column(col2, background_color=bgclr, justification='c'),
+               psg.Column(col3, background_color=bgclr, justification='c'),
+               psg.Column(col4, background_color=bgclr, justification='c')]
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c')
+    x = 0
     while True:
         event, values = window.read()
         if event in (None, 'Exit'):
@@ -262,6 +279,78 @@ def sixthpage():
         elif event == 'Back':
             window.close()
             fourthpage()
+        elif event == '-1-' and x == 0:
+            if window['-1-'].get_text() == '':
+                window['-1-'].update('X')
+                x = 1
+        elif event == '-1-' and x == 1:
+            if window['-1-'].get_text() == '':
+                window['-1-'].update('O')
+                x = 0
+        elif event == '-2-' and x == 0:
+            if window['-2-'].get_text() == '':
+                window['-2-'].update('X')
+                x = 1
+        elif event == '-2-' and x == 1:
+            if window['-2-'].get_text() == '':
+                window['-2-'].update('O')
+                x = 0
+        elif event == '-3-' and x == 0:
+            if window['-3-'].get_text() == '':
+                window['-3-'].update('X')
+                x = 1
+        elif event == '-3-' and x == 1:
+            if window['-3-'].get_text() == '':
+                window['-3-'].update('O')
+                x = 0
+        elif event == '-4-' and x == 0:
+            if window['-4-'].get_text() == '':
+                window['-4-'].update('X')
+                x = 1
+        elif event == '-4-' and x == 1:
+            if window['-4-'].get_text() == '':
+                window['-4-'].update('O')
+                x = 0
+        elif event == '-5-' and x == 0:
+            if window['-5-'].get_text() == '':
+                window['-5-'].update('X')
+                x = 1
+        elif event == '-5-' and x == 1:
+            if window['-5-'].get_text() == '':
+                window['-5-'].update('O')
+                x = 0
+        elif event == '-6-' and x == 0:
+            if window['-6-'].get_text() == '':
+                window['-6-'].update('X')
+                x = 1
+        elif event == '-6-' and x == 1:
+            if window['-6-'].get_text() == '':
+                window['-6-'].update('O')
+                x = 0
+        elif event == '-7-' and x == 0:
+            if window['-7-'].get_text() == '':
+                window['-7-'].update('X')
+                x = 1
+        elif event == '-7-' and x == 1:
+            if window['-7-'].get_text() == '':
+                window['-7-'].update('O')
+                x = 0
+        elif event == '-8-' and x == 0:
+            if window['-8-'].get_text() == '':
+                window['-8-'].update('X')
+                x = 1
+        elif event == '-8-' and x == 1:
+            if window['-8-'].get_text() == '':
+                window['-8-'].update('O')
+                x = 0
+        elif event == '-9-' and x == 0:
+            if window['-9-'].get_text() == '':
+                window['-9-'].update('X')
+                x = 1
+        elif event == '-9-' and x == 1:
+            if window['-9-'].get_text() == '':
+                window['-9-'].update('O')
+                x = 0
     window.close()
 
 
@@ -436,4 +525,4 @@ def ninthpage():
     window.close()
 
 
-firstpage()
+sixthpage()
