@@ -1,9 +1,15 @@
+import time
+
 import PySimpleGUI as psg
 import cv2
+import threading
+import queue
 
 
 bgclr = 'light blue'
 camera_index = 0
+queue = queue.Queue()
+window = None
 
 
 def firstpage():
@@ -245,7 +251,21 @@ def fifthpage():
     window.close()
 
 
+def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
+    global window
+    tmp = f'-{pos}-'
+
+    window[tmp].update(letter)
+
+
+def request_put(pos, letter):
+    msg = f'{pos} {letter}'
+    queue.put(msg)
+    print('requested')
+
 def sixthpage():
+    global window
+
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -270,87 +290,32 @@ def sixthpage():
                psg.Column(col4, background_color=bgclr, justification='c')]
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c')
+                        element_justification='c',finalize=True)
     x = 0
     while True:
-        event, values = window.read()
-        if event in (None, 'Exit'):
+        event, values = window.read(timeout=100)
+
+        if event == 'Exit':
             break
         elif event == 'Back':
             window.close()
             fourthpage()
-        elif event == '-1-' and x == 0:
-            if window['-1-'].get_text() == '':
-                window['-1-'].update('X')
-                x = 1
-        elif event == '-1-' and x == 1:
-            if window['-1-'].get_text() == '':
-                window['-1-'].update('O')
-                x = 0
-        elif event == '-2-' and x == 0:
-            if window['-2-'].get_text() == '':
-                window['-2-'].update('X')
-                x = 1
-        elif event == '-2-' and x == 1:
-            if window['-2-'].get_text() == '':
-                window['-2-'].update('O')
-                x = 0
-        elif event == '-3-' and x == 0:
-            if window['-3-'].get_text() == '':
-                window['-3-'].update('X')
-                x = 1
-        elif event == '-3-' and x == 1:
-            if window['-3-'].get_text() == '':
-                window['-3-'].update('O')
-                x = 0
-        elif event == '-4-' and x == 0:
-            if window['-4-'].get_text() == '':
-                window['-4-'].update('X')
-                x = 1
-        elif event == '-4-' and x == 1:
-            if window['-4-'].get_text() == '':
-                window['-4-'].update('O')
-                x = 0
-        elif event == '-5-' and x == 0:
-            if window['-5-'].get_text() == '':
-                window['-5-'].update('X')
-                x = 1
-        elif event == '-5-' and x == 1:
-            if window['-5-'].get_text() == '':
-                window['-5-'].update('O')
-                x = 0
-        elif event == '-6-' and x == 0:
-            if window['-6-'].get_text() == '':
-                window['-6-'].update('X')
-                x = 1
-        elif event == '-6-' and x == 1:
-            if window['-6-'].get_text() == '':
-                window['-6-'].update('O')
-                x = 0
-        elif event == '-7-' and x == 0:
-            if window['-7-'].get_text() == '':
-                window['-7-'].update('X')
-                x = 1
-        elif event == '-7-' and x == 1:
-            if window['-7-'].get_text() == '':
-                window['-7-'].update('O')
-                x = 0
-        elif event == '-8-' and x == 0:
-            if window['-8-'].get_text() == '':
-                window['-8-'].update('X')
-                x = 1
-        elif event == '-8-' and x == 1:
-            if window['-8-'].get_text() == '':
-                window['-8-'].update('O')
-                x = 0
-        elif event == '-9-' and x == 0:
-            if window['-9-'].get_text() == '':
-                window['-9-'].update('X')
-                x = 1
-        elif event == '-9-' and x == 1:
-            if window['-9-'].get_text() == '':
-                window['-9-'].update('O')
-                x = 0
+        elif not queue.empty():  # Berakja a varakozasban levo lepest
+            raw = queue.get()
+            raw = raw.split()
+            pos = int(raw[0])
+            letter = raw[1]
+            put_on_window(pos, letter)
+        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
+            for i in range(1, 10):
+                tmp = f'-{i}-'
+                if event == tmp and window[tmp].get_text() == '':
+                    letter = 'O'
+                    if x:
+                        letter = 'X'
+                    put_on_window(i, letter)
+                    x = not x
+                    break
     window.close()
 
 
@@ -525,4 +490,5 @@ def ninthpage():
     window.close()
 
 
-sixthpage()
+threading.Thread(target=sixthpage).start()
+threading.Thread(target=request_put, args=(3, 'X')).start()
