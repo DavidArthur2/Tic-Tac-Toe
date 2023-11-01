@@ -125,7 +125,26 @@ def print_board():
         print('\n-------------')
 
 
-def start_game():
+def request_random_step(letter):
+    # Putting on random pos
+    random_pos = random.randint(1, 9)
+    while put(random_pos, letter) != 1:
+        random_pos = random.randint(1, 9)
+    res, win_list = check_win()
+    if res == TIE:  # If the game is TIE
+        print('The game finished TIE')
+        print_board()
+        return
+
+        # When we have a winner
+    if res != NOT_ENDED:
+        print(f'The winner is: {decode_letter(current_player)}\n')
+        print_board()
+        print(f'The win list: {win_list}')
+        return
+
+
+def start_game():  # ONLY FOR TEST PURPOSES, RANDOM GAME SIMULATION
     clear_board()
 
     current_player = random.randint(1, 2)
