@@ -1,5 +1,3 @@
-import time
-
 import PySimpleGUI as psg
 import cv2
 import threading
@@ -450,7 +448,40 @@ def eighthpage():
                     cap.release()
                     cap = None
                     break
-
+                elif event == 'Back':
+                    cap.release()
+                    cap = None
+                    window.close()
+                    fourthpage()
+                    break
+                elif event == 'lightblue':
+                    bgclr = 'light blue'
+                    cap.release()
+                    cap = None
+                    window.close()
+                    eighthpage()
+                    break
+                elif event == 'lightgreen':
+                    bgclr = 'light green'
+                    cap.release()
+                    cap = None
+                    window.close()
+                    eighthpage()
+                    break
+                elif event == 'red':
+                    bgclr = 'red'
+                    cap.release()
+                    cap = None
+                    window.close()
+                    eighthpage()
+                    break
+                elif event == 'lightyellow':
+                    bgclr = 'light yellow'
+                    window.close()
+                    cap.release()
+                    cap = None
+                    eighthpage()
+                    break
     window.close()
 
 
