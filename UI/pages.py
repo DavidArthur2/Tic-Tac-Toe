@@ -6,13 +6,15 @@ import queue
 from PySimpleGUI import WIN_CLOSED
 
 bgclr = 'light blue'
-camera_index = None
+camera_index = 1
 queue = queue.Queue()
 window = None
 win = None
 buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+
 def firstpage():
+    global window
     b1 = psg.Button("Login", size=(30, 2))
     b2 = psg.Button("Register", size=(30, 2))
     b3 = psg.Button("Play as Guest", size=(30, 2))
@@ -50,6 +52,7 @@ def firstpage():
 
 
 def secondpage():
+    global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Username:', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Password:', font=('Algerian', 15), text_color='black', background_color=bgclr)
@@ -97,6 +100,7 @@ def secondpage():
 
 
 def thirdpage():
+    global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     username = psg.Input(size=20, font=('Times New Roman', 14))
     psw = psg.Input(password_char='*', size=20, font=('Times New Roman', 14), key='-psw-')
@@ -155,6 +159,7 @@ def thirdpage():
 
 
 def fourthpage():
+    global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Ranking: ', font=('Algerian', 13), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='21', font=('Algerian', 13), text_color='black', background_color=bgclr)
@@ -163,7 +168,7 @@ def fourthpage():
     pvp = psg.Button('PVP', size=(25, 2))
     leaderboard = psg.Button('Leaderboard', size=(15, 2))
     settings = psg.Button('Settings', size=(15, 2))
-    turorial = psg.Button('Tutorial', size=(15, 2))
+    tutorial = psg.Button('Tutorial', size=(15, 2))
     logout = psg.Button('Logout', size=(10, 1))
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     space2 = psg.Text('', size=(10, 1), background_color=bgclr)
@@ -184,7 +189,7 @@ def fourthpage():
               [space4],
               [psg.Column(col4, background_color=bgclr, justification='c')],
               [space3],
-              [psg.Column(col5, background_color=bgclr, justification='c'), leaderboard, turorial],
+              [psg.Column(col5, background_color=bgclr, justification='c'), leaderboard, tutorial],
               [popup],
               [space5],
               [psg.Column(col6, background_color=bgclr, justification='r')]
@@ -225,6 +230,7 @@ def fourthpage():
 
 
 def fifthpage():
+    global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Ranking: ', font=('Algerian', 13), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='21', font=('Algerian', 13), text_color='black', background_color=bgclr)
@@ -276,11 +282,11 @@ def fifthpage():
 def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
     global window, buttons
     tmp = f'-{pos}-'
-    buttons[pos-1] = 1
+    buttons[pos - 1] = 1
     if letter == 'X':
-        window[tmp].update(image_filename='X (1).png')
+        window[tmp].update(image_filename='X.png')
     else:
-        window[tmp].update(image_filename='O (1).png')
+        window[tmp].update(image_filename='O.png')
 
 
 def request_put(pos, letter):
@@ -289,35 +295,51 @@ def request_put(pos, letter):
     print('requested')
 
 
+def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
+    global window
+    if outcome == 0:
+        window[f'{round}.round'].update(image_filename='roundX.png')
+    else:
+        window[f'{round}.round'].update(image_filename='roundCheck.png')
+
+
 def sixthpage():
     global window
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    b1 = psg.Button('', size=(15, 6), key='-1-')
-    b2 = psg.Button('', size=(15, 6), key='-2-')
-    b3 = psg.Button('', size=(15, 6), key='-3-')
-    b4 = psg.Button('', size=(15, 6), key='-4-')
-    b5 = psg.Button('', size=(15, 6), key='-5-')
-    b6 = psg.Button('', size=(15, 6), key='-6-')
-    b7 = psg.Button('', size=(15, 6), key='-7-')
-    b8 = psg.Button('', size=(15, 6), key='-8-')
-    b9 = psg.Button('', size=(15, 6), key='-9-')
+    text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
+    b1 = psg.Button('', key='-1-', button_color='white', image_filename='background.png')
+    b2 = psg.Button('', key='-2-', button_color='white', image_filename='background.png')
+    b3 = psg.Button('', key='-3-', button_color='white', image_filename='background.png')
+    b4 = psg.Button('', key='-4-', button_color='white', image_filename='background.png')
+    b5 = psg.Button('', key='-5-', button_color='white', image_filename='background.png')
+    b6 = psg.Button('', key='-6-', button_color='white', image_filename='background.png')
+    b7 = psg.Button('', key='-7-', button_color='white', image_filename='background.png')
+    b8 = psg.Button('', key='-8-', button_color='white', image_filename='background.png')
+    b9 = psg.Button('', key='-9-', button_color='white', image_filename='background.png')
+    round1 = psg.Button('', key='1.round', button_color='white', image_filename='roundX.png')
+    round2 = psg.Button('', key='2.round', button_color='white', image_filename='roundCheck.png')
+    round3 = psg.Button('', key='3.round', button_color='white', image_filename='roundBlank.png')
     im = psg.Image(filename="", key="image")
-    space1 = psg.Text('', size=(30, 3), background_color=bgclr)
+    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
+    space2 = psg.Text('', size=(30, 1), background_color=bgclr)
     col1 = [[text1]]
     col2 = [[b1], [b4], [b7]]
     col3 = [[b2], [b5], [b8]]
     col4 = [[b3], [b6], [b9]]
+    col5 = [[text4]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
+              [psg.Column(col5, background_color=bgclr, justification='l'), round1, round2, round3],
               [space1],
               [psg.Column(col2, background_color=bgclr, justification='c'),
                psg.Column(col3, background_color=bgclr, justification='c'),
                psg.Column(col4, background_color=bgclr, justification='c')],
+              [space2],
               [im]
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c',finalize=True)
+                        element_justification='c', finalize=True)
     cap = None
     x = 0
     while True:
@@ -351,7 +373,7 @@ def sixthpage():
             else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
                 for i in range(1, 10):
                     tmp = f'-{i}-'
-                    if event == tmp and window[tmp].get_text() == '':
+                    if event == tmp and buttons[i - 1] == 0:
                         letter = 'O'
                         if x:
                             letter = 'X'
@@ -364,6 +386,7 @@ def sixthpage():
 
 
 def seventhpage():
+    global window
     text1 = psg.Text(text='Leaderboard: ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='1.', font=('Algerian', 20), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 20), text_color='black', background_color=bgclr)
@@ -394,6 +417,7 @@ def seventhpage():
 
 
 def get_available_cameras():
+    global camera_list
     camera_list = []
     for i in range(1):
         cap = cv2.VideoCapture(i)
@@ -405,11 +429,13 @@ def get_available_cameras():
 
 
 camera_list = get_available_cameras()
-#camera_list = (1, 1)
+
+
+# camera_list = (1, 1)
 
 
 def eighthpage():
-    global bgclr
+    global bgclr, window
     text1 = psg.Text(text='Settings ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Change background color:', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Select preferred camera: ', font=('Algerian', 15), text_color='black',
@@ -531,6 +557,7 @@ def eighthpage():
 
 
 def ninthpage():
+    global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Players online: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Rank: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
@@ -579,28 +606,36 @@ def tenthpage():
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    b1 = psg.Button('', key='-1-', button_color=('white', 'white'), image_filename='BLANK.png')
-    b2 = psg.Button('', key='-2-', image_filename='BLANK.png')
-    b3 = psg.Button('', key='-3-', image_filename='BLANK.png')
-    b4 = psg.Button('', key='-4-', image_filename='BLANK.png')
-    b5 = psg.Button('', key='-5-', image_filename='BLANK.png')
-    b6 = psg.Button('', key='-6-', image_filename='BLANK.png')
-    b7 = psg.Button('', key='-7-', image_filename='BLANK.png')
-    b8 = psg.Button('', key='-8-', image_filename='BLANK.png')
-    b9 = psg.Button('', key='-9-', image_filename='BLANK.png')
-    space1 = psg.Text('', size=(30, 3), background_color=bgclr)
+    text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
+    b1 = psg.Button('', key='-1-', button_color='white', image_filename='background.png')
+    b2 = psg.Button('', key='-2-', button_color='white', image_filename='background.png')
+    b3 = psg.Button('', key='-3-', button_color='white', image_filename='background.png')
+    b4 = psg.Button('', key='-4-', button_color='white', image_filename='background.png')
+    b5 = psg.Button('', key='-5-', button_color='white', image_filename='background.png')
+    b6 = psg.Button('', key='-6-', button_color='white', image_filename='background.png')
+    b7 = psg.Button('', key='-7-', button_color='white', image_filename='background.png')
+    b8 = psg.Button('', key='-8-', button_color='white', image_filename='background.png')
+    b9 = psg.Button('', key='-9-', button_color='white', image_filename='background.png')
+    round1 = psg.Button('', key='1.round', button_color='white', image_filename='roundBlank.png')
+    round2 = psg.Button('', key='2.round', button_color='white', image_filename='roundBlank.png')
+    round3 = psg.Button('', key='3.round', button_color='white', image_filename='roundBlank.png')
+    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
+    space2 = psg.Text('', size=(30, 1), background_color=bgclr)
     col1 = [[text1]]
     col2 = [[b1], [b4], [b7]]
     col3 = [[b2], [b5], [b8]]
     col4 = [[b3], [b6], [b9]]
+    col5 = [[text4]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
+              [space2],
+              [psg.Column(col5, background_color=bgclr, justification='l'), round1, round2, round3],
               [space1],
               [psg.Column(col2, background_color=bgclr, justification='c'),
                psg.Column(col3, background_color=bgclr, justification='c'),
                psg.Column(col4, background_color=bgclr, justification='c')]
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c',finalize=True)
+                        element_justification='c', finalize=True)
     x = 0
     while True:
         event, values = window.read(timeout=100)
@@ -620,7 +655,7 @@ def tenthpage():
             global buttons
             for i in range(1, 10):
                 tmp = f'-{i}-'
-                if event == tmp and buttons[i-1] == 0:
+                if event == tmp and buttons[i - 1] == 0:
                     letter = 'O'
                     if x:
                         letter = 'X'
@@ -631,6 +666,7 @@ def tenthpage():
 
 
 def eleventhpage():
+    global window
     text1 = psg.Text(text='Waiting', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='for', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -662,6 +698,7 @@ def eleventhpage():
 
 
 def twelfth():
+    global win, window
     win = 1
     if win == 0:
         text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
@@ -691,7 +728,7 @@ def twelfth():
               [space3],
               [psg.Column(col4, background_color=bgclr, justification='c'),
                psg.Column(col5, background_color=bgclr, justification='c')]
-             ]
+              ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c', finalize=True)
     while True:
@@ -709,4 +746,4 @@ def twelfth():
 
 # threading.Thread(target=sixthpage).start()
 # threading.Thread(target=request_put, args=(3, 'X')).start()
-tenthpage()
+firstpage()
