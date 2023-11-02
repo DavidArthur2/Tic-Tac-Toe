@@ -5,6 +5,7 @@ import cv2
 import threading
 import queue
 
+from PySimpleGUI import WIN_CLOSED
 
 bgclr = 'light blue'
 camera_index = 0
@@ -295,7 +296,7 @@ def sixthpage():
     while True:
         event, values = window.read(timeout=100)
 
-        if event == 'Exit':
+        if event == WIN_CLOSED:
             break
         elif event == 'Back':
             window.close()
@@ -360,8 +361,8 @@ def get_available_cameras():
     return camera_list
 
 
-# camera_list = get_available_cameras()
-camera_list = (1, 1)
+camera_list = get_available_cameras()
+#camera_list = (1, 1)
 
 
 def eighthpage():
@@ -490,5 +491,6 @@ def ninthpage():
     window.close()
 
 
-threading.Thread(target=sixthpage).start()
-threading.Thread(target=request_put, args=(3, 'X')).start()
+#threading.Thread(target=sixthpage).start()
+#threading.Thread(target=request_put, args=(3, 'X')).start()
+ninthpage()
