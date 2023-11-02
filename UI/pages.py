@@ -6,10 +6,11 @@ import queue
 from PySimpleGUI import WIN_CLOSED
 
 bgclr = 'light blue'
-camera_index = 0
+camera_index = None
 queue = queue.Queue()
 window = None
-
+win = None
+buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 def firstpage():
     b1 = psg.Button("Login", size=(30, 2))
@@ -169,6 +170,7 @@ def fourthpage():
     space3 = psg.Text('', size=(30, 5), background_color=bgclr)
     space4 = psg.Text('', size=(10, 1), background_color=bgclr)
     space5 = psg.Text('', size=(10, 4), background_color=bgclr)
+    popup = psg.Button('PopUp')
     col1 = [[text1]]
     col2 = [[text2]]
     col3 = [[text4]]
@@ -183,6 +185,7 @@ def fourthpage():
               [psg.Column(col4, background_color=bgclr, justification='c')],
               [space3],
               [psg.Column(col5, background_color=bgclr, justification='c'), leaderboard, turorial],
+              [popup],
               [space5],
               [psg.Column(col6, background_color=bgclr, justification='r')]
               ]
@@ -204,6 +207,20 @@ def fourthpage():
         elif event == 'Settings':
             window.close()
             eighthpage()
+        elif event == 'PVE':
+            window.close()
+            if camera_index is None:
+                tenthpage()
+            else:
+                sixthpage()
+        elif event == 'PopUp':
+            ch = psg.popup_yes_no("Zoli invited you, do you want to play ?", title="Invitation")
+            if ch == 'Yes':
+                window.close()
+                if camera_index is None:
+                    tenthpage()
+                else:
+                    sixthpage()
     window.close()
 
 
@@ -247,14 +264,23 @@ def fifthpage():
         elif event == 'Online':
             window.close()
             ninthpage()
+        elif event == 'Same PC':
+            window.close()
+            if camera_index is None:
+                tenthpage()
+            else:
+                sixthpage()
     window.close()
 
 
 def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
-    global window
+    global window, buttons
     tmp = f'-{pos}-'
-
-    window[tmp].update(letter)
+    buttons[pos-1] = 1
+    if letter == 'X':
+        window[tmp].update(image_filename='X (1).png')
+    else:
+        window[tmp].update(image_filename='O (1).png')
 
 
 def request_put(pos, letter):
@@ -262,9 +288,9 @@ def request_put(pos, letter):
     queue.put(msg)
     print('requested')
 
+
 def sixthpage():
     global window
-
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -277,6 +303,7 @@ def sixthpage():
     b7 = psg.Button('', size=(15, 6), key='-7-')
     b8 = psg.Button('', size=(15, 6), key='-8-')
     b9 = psg.Button('', size=(15, 6), key='-9-')
+    im = psg.Image(filename="", key="image")
     space1 = psg.Text('', size=(30, 3), background_color=bgclr)
     col1 = [[text1]]
     col2 = [[b1], [b4], [b7]]
@@ -286,35 +313,53 @@ def sixthpage():
               [space1],
               [psg.Column(col2, background_color=bgclr, justification='c'),
                psg.Column(col3, background_color=bgclr, justification='c'),
-               psg.Column(col4, background_color=bgclr, justification='c')]
+               psg.Column(col4, background_color=bgclr, justification='c')],
+              [im]
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c',finalize=True)
+    cap = None
     x = 0
     while True:
         event, values = window.read(timeout=100)
+        global camera_index
+        if cap is None:
+            cap = cv2.VideoCapture(camera_index)
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                psg.popup_error("Camera not available.")
+                cap.release()
+                cap = None
+                break
+            frame = cv2.resize(frame, (194, 144))
+            imgbytes = cv2.imencode(".png", frame)[1].tobytes()
 
-        if event == WIN_CLOSED:
+            window["image"].update(data=imgbytes)
+
+            event, values = window.read(timeout=20)
+            if event == psg.WIN_CLOSED or event == "Exit":
+                cap.release()
+                cap = None
+                break
+            elif not queue.empty():  # Berakja a varakozasban levo lepest
+                raw = queue.get()
+                raw = raw.split()
+                pos = int(raw[0])
+                letter = raw[1]
+                put_on_window(pos, letter)
+            else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
+                for i in range(1, 10):
+                    tmp = f'-{i}-'
+                    if event == tmp and window[tmp].get_text() == '':
+                        letter = 'O'
+                        if x:
+                            letter = 'X'
+                        put_on_window(i, letter)
+                        x = not x
+                        break
+        if event == psg.WIN_CLOSED or event == "Exit":
             break
-        elif event == 'Back':
-            window.close()
-            fourthpage()
-        elif not queue.empty():  # Berakja a varakozasban levo lepest
-            raw = queue.get()
-            raw = raw.split()
-            pos = int(raw[0])
-            letter = raw[1]
-            put_on_window(pos, letter)
-        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
-            for i in range(1, 10):
-                tmp = f'-{i}-'
-                if event == tmp and window[tmp].get_text() == '':
-                    letter = 'O'
-                    if x:
-                        letter = 'X'
-                    put_on_window(i, letter)
-                    x = not x
-                    break
     window.close()
 
 
@@ -495,9 +540,9 @@ def ninthpage():
     space3 = psg.Text('', size=(15, 1), background_color=bgclr)
     space4 = psg.Text('', size=(15, 3), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[psg.Button(size=(20, 2), button_text=f"Player {row + 1}", key=row)] for row in range(3)]
-    col3 = [[psg.Text(text=f"{rank + 1}", font=('Algerian', 25), text_color='black',
-                      background_color=bgclr)] for rank in range(3)]
+    col2 = [[psg.Button(size=(20, 2), button_text=f"Player {row}", key=f'P{row}')] for row in range(1, 4)]
+    col3 = [[psg.Text(text=f"{rank}", font=('Algerian', 25), text_color='black',
+                      background_color=bgclr)] for rank in range(1, 4)]
     col4 = [[text2]]
     col5 = [[b1]]
     col6 = [[text3]]
@@ -519,9 +564,149 @@ def ninthpage():
         elif event == 'Back':
             window.close()
             fifthpage()
+        if event == 'P1':
+            window.close()
+            if camera_index is None:
+                tenthpage()
+            else:
+                sixthpage()
     window.close()
 
 
-#threading.Thread(target=sixthpage).start()
-#threading.Thread(target=request_put, args=(3, 'X')).start()
-ninthpage()
+def tenthpage():
+    global window
+
+    text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    b1 = psg.Button('', key='-1-', button_color=('white', 'white'), image_filename='BLANK.png')
+    b2 = psg.Button('', key='-2-', image_filename='BLANK.png')
+    b3 = psg.Button('', key='-3-', image_filename='BLANK.png')
+    b4 = psg.Button('', key='-4-', image_filename='BLANK.png')
+    b5 = psg.Button('', key='-5-', image_filename='BLANK.png')
+    b6 = psg.Button('', key='-6-', image_filename='BLANK.png')
+    b7 = psg.Button('', key='-7-', image_filename='BLANK.png')
+    b8 = psg.Button('', key='-8-', image_filename='BLANK.png')
+    b9 = psg.Button('', key='-9-', image_filename='BLANK.png')
+    space1 = psg.Text('', size=(30, 3), background_color=bgclr)
+    col1 = [[text1]]
+    col2 = [[b1], [b4], [b7]]
+    col3 = [[b2], [b5], [b8]]
+    col4 = [[b3], [b6], [b9]]
+    layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
+              [space1],
+              [psg.Column(col2, background_color=bgclr, justification='c'),
+               psg.Column(col3, background_color=bgclr, justification='c'),
+               psg.Column(col4, background_color=bgclr, justification='c')]
+              ]
+    window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
+                        element_justification='c',finalize=True)
+    x = 0
+    while True:
+        event, values = window.read(timeout=100)
+
+        if event == WIN_CLOSED:
+            break
+        elif event == 'Back':
+            window.close()
+            fourthpage()
+        elif not queue.empty():  # Berakja a varakozasban levo lepest
+            raw = queue.get()
+            raw = raw.split()
+            pos = int(raw[0])
+            letter = raw[1]
+            put_on_window(pos, letter)
+        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
+            global buttons
+            for i in range(1, 10):
+                tmp = f'-{i}-'
+                if event == tmp and buttons[i-1] == 0:
+                    letter = 'O'
+                    if x:
+                        letter = 'X'
+                    put_on_window(i, letter)
+                    x = not x
+                    break
+    window.close()
+
+
+def eleventhpage():
+    text1 = psg.Text(text='Waiting', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text2 = psg.Text(text='for', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text4 = psg.Text(text='to', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text5 = psg.Text(text='Respond...', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    space1 = psg.Text('', size=(30, 7), background_color=bgclr)
+    space2 = psg.Text('', size=(30, 6), background_color=bgclr)
+    b1 = psg.Button('Cancel', size=(10, 1))
+    col1 = [[b1]]
+    layout = [[space1],
+              [text1],
+              [text2],
+              [text3],
+              [text4],
+              [text5],
+              [space2],
+              [psg.Column(col1, background_color=bgclr, justification='r')]
+              ]
+    window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
+                        element_justification='c', finalize=True)
+    while True:
+        event, values = window.read()
+        if event in (None, 'Exit'):
+            break
+        elif event == 'Cancel':
+            window.close()
+            fourthpage()
+    window.close()
+
+
+def twelfth():
+    win = 1
+    if win == 0:
+        text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
+                         background_color='green', border_width=50)
+    else:
+        text1 = psg.Text(text='Defeat', font=('Algerian', 50), text_color='black',
+                         background_color='red', border_width=50)
+    text2 = psg.Text(text='New Rank:', font=('Algerian', 30), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text='112', font=('Algerian', 30), text_color='black', background_color=bgclr)
+    space1 = psg.Text('', size=(30, 4), background_color=bgclr)
+    space2 = psg.Text('', size=(30, 1), background_color=bgclr)
+    space3 = psg.Text('', size=(30, 4), background_color=bgclr)
+    space4 = psg.Text('', size=(30, 1), background_color=bgclr)
+    new_game = psg.Button('New Game', size=(25, 3))
+    rematch = psg.Button('Rematch', size=(25, 3))
+    col1 = [[text1]]
+    col2 = [[text2]]
+    col3 = [[text3]]
+    col4 = [[new_game]]
+    col5 = [[rematch]]
+    layout = [[space4],
+              [psg.Column(col1, background_color=bgclr, justification='c')],
+              [space1],
+              [psg.Column(col2, background_color=bgclr, justification='c')],
+              [space2],
+              [psg.Column(col3, background_color=bgclr, justification='c')],
+              [space3],
+              [psg.Column(col4, background_color=bgclr, justification='c'),
+               psg.Column(col5, background_color=bgclr, justification='c')]
+             ]
+    window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
+                        element_justification='c', finalize=True)
+    while True:
+        event, values = window.read()
+        if event in (None, 'Exit'):
+            break
+        elif event == 'New Game':
+            window.close()
+            fourthpage()
+        elif event == 'Rematch':
+            window.close()
+            eleventhpage()
+    window.close()
+
+
+# threading.Thread(target=sixthpage).start()
+# threading.Thread(target=request_put, args=(3, 'X')).start()
+tenthpage()
