@@ -1,13 +1,12 @@
 import PySimpleGUI as psg
 import cv2
 import threading
-import queue
+from base_game import *
 
 from PySimpleGUI import WIN_CLOSED
 
 bgclr = 'light blue'
 camera_index = 0
-queue = queue.Queue()
 window = None
 
 
@@ -257,11 +256,6 @@ def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
     window[tmp].update(letter)
 
 
-def request_put(pos, letter):
-    msg = f'{pos} {letter}'
-    queue.put(msg)
-    print('requested')
-
 def sixthpage():
     global window
 
@@ -299,21 +293,25 @@ def sixthpage():
         elif event == 'Back':
             window.close()
             fourthpage()
-        elif not queue.empty():  # Berakja a varakozasban levo lepest
+        elif not queue.empty():  # Berakja a varakozasban levo lepest a grafikus feluletre
             raw = queue.get()
             raw = raw.split()
             pos = int(raw[0])
             letter = raw[1]
             put_on_window(pos, letter)
-        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
+        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt kerjuk feldolgozasra
             for i in range(1, 10):
                 tmp = f'-{i}-'
                 if event == tmp and window[tmp].get_text() == '':
-                    letter = 'O'
+                    letter = LETTER_O
                     if x:
-                        letter = 'X'
-                    put_on_window(i, letter)
-                    x = not x
+                        letter = LETTER_X
+                    res = put(i, letter)
+                    if res == -1:
+                        print('Cell not empty')
+                    elif res == 0 or res == 2:  # Spaces full already, or game end
+                        break
+                    request_random_step(switch_letter(letter))
                     break
     window.close()
 
@@ -524,4 +522,3 @@ def ninthpage():
 
 #threading.Thread(target=sixthpage).start()
 #threading.Thread(target=request_put, args=(3, 'X')).start()
-ninthpage()

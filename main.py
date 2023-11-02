@@ -5,6 +5,8 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gestu
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 from base_recognition import operate_recognition
+from pages import sixthpage
+from base_game import start_game
 
 
 def print_hi(name):
@@ -13,5 +15,6 @@ def print_hi(name):
 
 if __name__ == '__main__':
     print_hi('Szar3')
-    # threading.Thread(target=operate_recognition).start()
+    # threading.Thread(target=start_game).start()
+    sixthpage()
 

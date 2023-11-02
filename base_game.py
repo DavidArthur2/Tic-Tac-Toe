@@ -1,5 +1,11 @@
 import math
 import random
+import queue
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
+
+queue = queue.Queue()
 
 # Defines
 LETTER_X = 1
@@ -45,20 +51,6 @@ def encode_pos(row, col):
             if i == row and j == col:
                 return k
             k += 1
-
-
-def put(pos, letter):  # Returns: -1, if not empty; 0, if no space; 1, if successful
-    global board_counter
-
-    row, col = decode_pos(pos)
-    if board[row][col] != EMPTY:
-        return -1
-    if board_counter == 9:
-        return 0
-    board[row][col] = letter
-    #  Ide majd a grafikus meghivást
-    board_counter += 1
-    return 1
 
 
 def check_win():  # Returns NOT_ENDED,None; TIE,None; or WINNER,WIN_LIST; where WIN_LIST contains 3 positions
@@ -111,7 +103,7 @@ def decode_letter(letter):
     return ' '
 
 
-def switch_player(letter):
+def switch_letter(letter):
     if letter == LETTER_O:
         return LETTER_X
     return LETTER_O
@@ -125,23 +117,46 @@ def print_board():
         print('\n-------------')
 
 
+def put(pos, letter):  # Returns: -1, if not empty; 0, if no space; 1, if successful; 2, if successful and game end
+    global board_counter
+
+    row, col = decode_pos(pos)
+    if board[row][col] != EMPTY:
+        return -1
+    if board_counter == 9:
+        return 0
+    board[row][col] = letter
+
+    board_counter += 1
+    if letter == LETTER_O:
+        txt = 'O'
+    else:
+        txt = 'X'
+    msg = f'{pos} {txt}'
+    queue.put(msg)  # Atkuldi a grafikus feluletnek a kerest
+
+    res, win_list = check_win()
+    if res == TIE:  # If the game is TIE
+        print('The game finished TIE')
+        print_board()
+        return 2
+
+        # When we have a winner
+    if res != NOT_ENDED:
+        print(f'The winner is: {decode_letter(letter)}\n')
+        print_board()
+        print(f'The win list: {win_list}')
+        return 2
+
+    return 1
+
+
 def request_random_step(letter):
     # Putting on random pos
     random_pos = random.randint(1, 9)
     while put(random_pos, letter) != 1:
         random_pos = random.randint(1, 9)
-    res, win_list = check_win()
-    if res == TIE:  # If the game is TIE
-        print('The game finished TIE')
-        print_board()
-        return
-
-        # When we have a winner
-    if res != NOT_ENDED:
-        print(f'The winner is: {decode_letter(current_player)}\n')
-        print_board()
-        print(f'The win list: {win_list}')
-        return
+    put(random_pos, letter)
 
 
 def start_game():  # ONLY FOR TEST PURPOSES, RANDOM GAME SIMULATION
@@ -161,20 +176,18 @@ def start_game():  # ONLY FOR TEST PURPOSES, RANDOM GAME SIMULATION
         # print('\n')
 
         if res == NOT_ENDED:  # The game is not ended
-            current_player = switch_player(current_player)
+            current_player = switch_letter(current_player)
             continue
 
         if res == TIE:  # If the game is TIE
-            print('The game finished TIE')
+            print('The game finished TIEX')
             print_board()
             return
 
         # When we have a winner
 
-        print(f'The winner is: {decode_letter(current_player)}\n')
+        print(f'The winner isX: {decode_letter(current_player)}\n')
         print_board()
-        print(f'The win list: {win_list}')
+        print(f'The win listX: {win_list}')
         return
 
-
-start_game()
