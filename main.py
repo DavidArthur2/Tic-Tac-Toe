@@ -1,20 +1,22 @@
 import threading
 import sys
 import os
+import time
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gesture Recognition'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 from base_recognition import operate_recognition
-from pages import sixthpage
-from base_game import start_game
+import pages
+from base_game import start_match, GAME_PVE, GAME_SAMEPC, GAME_PVP
+import pyautogui
+import mouse_tracker
 
 
-def print_hi(name):
-    print(f'Ez a master branch {name}')
 
 
 if __name__ == '__main__':
-    print_hi('Szar3')
-    # threading.Thread(target=start_game).start()
-    sixthpage()
+    # threading.Thread(target=operate_recognition).start()
+
+    th=threading.Thread(target=start_match, args=(GAME_PVE,)).start()
+    # threading.Thread(target=mouse_tracker.get_mouse_segment()).start()
 

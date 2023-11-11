@@ -1,6 +1,8 @@
 import PySimpleGUI as psg
 import cv2
 import threading
+
+import base_game
 from base_game import *
 
 from PySimpleGUI import WIN_CLOSED
@@ -8,9 +10,14 @@ from PySimpleGUI import WIN_CLOSED
 bgclr = 'light blue'
 camera_index = 0
 window = None
+position = None
+
+Closed = threading.Event()
+Ended = threading.Event()
 
 
 def firstpage():
+    global window, position
     b1 = psg.Button("Login", size=(30, 2))
     b2 = psg.Button("Register", size=(30, 2))
     b3 = psg.Button("Play as Guest", size=(30, 2))
@@ -30,9 +37,11 @@ def firstpage():
               [space3],
               [psg.Column(col3, background_color=bgclr, justification='r'), text3]]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c')
+                        element_justification='c', finalize=True)
+
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
+        position = window.current_location()
         if event in (None, 'Exit'):
             break
         elif event == 'Login':
@@ -257,8 +266,9 @@ def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
 
 
 def sixthpage():
-    global window
+    global window, position
 
+    Closed.clear()
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -277,17 +287,23 @@ def sixthpage():
     col3 = [[b2], [b5], [b8]]
     col4 = [[b3], [b6], [b9]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
-              [space1],
-              [psg.Column(col2, background_color=bgclr, justification='c'),
-               psg.Column(col3, background_color=bgclr, justification='c'),
-               psg.Column(col4, background_color=bgclr, justification='c')]
-              ]
+                  [space1],
+                  [psg.Column(col2, background_color=bgclr, justification='c'),
+                   psg.Column(col3, background_color=bgclr, justification='c'),
+                   psg.Column(col4, background_color=bgclr, justification='c')]
+                  ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c',finalize=True)
-    x = 0
-    while True:
-        event, values = window.read(timeout=100)
+                            element_justification='c')
+    # Start game code
 
+    scr = base_game.current_round
+    while scr == base_game.current_round:
+        if base_game.sig:  # Stops it if it's TIE
+            base_game.sig = False
+            break
+
+        event, values = window.read(timeout=100)
+        position = window.current_location()
         if event == WIN_CLOSED:
             break
         elif event == 'Back':
@@ -302,19 +318,11 @@ def sixthpage():
         else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt kerjuk feldolgozasra
             for i in range(1, 10):
                 tmp = f'-{i}-'
-                if event == tmp and window[tmp].get_text() == '':
-                    letter = LETTER_O
-                    if x:
-                        letter = LETTER_X
-                    res = put(i, letter)
-                    if res == -1:
-                        print('Cell not empty')
-                    elif res == 0 or res == 2:  # Spaces full already, or game end
-                        break
-                    request_random_step(switch_letter(letter))
+                if event == tmp:  # and window[tmp].get_text() == ''
+                    request_put(i, 3)
                     break
     window.close()
-
+    Closed.set()
 
 def seventhpage():
     text1 = psg.Text(text='Leaderboard: ', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -347,6 +355,7 @@ def seventhpage():
 
 
 def get_available_cameras():
+    return
     camera_list = []
     for i in range(1):
         cap = cv2.VideoCapture(i)
@@ -358,7 +367,9 @@ def get_available_cameras():
 
 
 camera_list = get_available_cameras()
-#camera_list = (1, 1)
+
+
+# camera_list = (1, 1)
 
 
 def eighthpage():
@@ -519,6 +530,5 @@ def ninthpage():
             fifthpage()
     window.close()
 
-
-#threading.Thread(target=sixthpage).start()
-#threading.Thread(target=request_put, args=(3, 'X')).start()
+# threading.Thread(target=sixthpage).start()
+# threading.Thread(target=request_put, args=(3, 'X')).start()
