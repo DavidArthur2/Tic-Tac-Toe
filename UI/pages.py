@@ -4,12 +4,11 @@ import threading
 
 import base_game
 from base_game import *
-
 from PySimpleGUI import WIN_CLOSED
 
 bgclr = 'light blue'
 
-camera_index = 1
+camera_index = 0
 position = None
 window = None
 win = None
@@ -291,17 +290,17 @@ def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
     tmp = f'-{pos}-'
     buttons[pos - 1] = 1
     if letter == 'X':
-        window[tmp].update(image_filename='X.png')
+        window[tmp].update(image_filename='UI/X.png')
     else:
-        window[tmp].update(image_filename='O.png')
+        window[tmp].update(image_filename='UI/O.png')
 
 
 def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
     global window
     if outcome == 0:
-        window[f'{round}.round'].update(image_filename='roundX.png')
+        window[f'{round}.round'].update(image_filename='UI/roundX.png')
     else:
-        window[f'{round}.round'].update(image_filename='roundCheck.png')
+        window[f'{round}.round'].update(image_filename='UI/roundCheck.png')
 
 
 def sixthpage():
@@ -312,18 +311,18 @@ def sixthpage():
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    b1 = psg.Button('', key='-1-', button_color='white', image_filename='background.png')
-    b2 = psg.Button('', key='-2-', button_color='white', image_filename='background.png')
-    b3 = psg.Button('', key='-3-', button_color='white', image_filename='background.png')
-    b4 = psg.Button('', key='-4-', button_color='white', image_filename='background.png')
-    b5 = psg.Button('', key='-5-', button_color='white', image_filename='background.png')
-    b6 = psg.Button('', key='-6-', button_color='white', image_filename='background.png')
-    b7 = psg.Button('', key='-7-', button_color='white', image_filename='background.png')
-    b8 = psg.Button('', key='-8-', button_color='white', image_filename='background.png')
-    b9 = psg.Button('', key='-9-', button_color='white', image_filename='background.png')
-    round1 = psg.Button('', key='1.round', button_color='white', image_filename='roundX.png')
-    round2 = psg.Button('', key='2.round', button_color='white', image_filename='roundCheck.png')
-    round3 = psg.Button('', key='3.round', button_color='white', image_filename='roundBlank.png')
+    b1 = psg.Button('', key='-1-', button_color='white', image_filename='UI/background.png')
+    b2 = psg.Button('', key='-2-', button_color='white', image_filename='UI/background.png')
+    b3 = psg.Button('', key='-3-', button_color='white', image_filename='UI/background.png')
+    b4 = psg.Button('', key='-4-', button_color='white', image_filename='UI/background.png')
+    b5 = psg.Button('', key='-5-', button_color='white', image_filename='UI/background.png')
+    b6 = psg.Button('', key='-6-', button_color='white', image_filename='UI/background.png')
+    b7 = psg.Button('', key='-7-', button_color='white', image_filename='UI/background.png')
+    b8 = psg.Button('', key='-8-', button_color='white', image_filename='UI/background.png')
+    b9 = psg.Button('', key='-9-', button_color='white', image_filename='UI/background.png')
+    round1 = psg.Button('', key='1.round', button_color='white', image_filename='UI/roundX.png')
+    round2 = psg.Button('', key='2.round', button_color='white', image_filename='UI/roundCheck.png')
+    round3 = psg.Button('', key='3.round', button_color='white', image_filename='UI/roundBlank.png')
     im = psg.Image(filename="", key="image")
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     space2 = psg.Text('', size=(30, 1), background_color=bgclr)
@@ -342,14 +341,13 @@ def sixthpage():
               [im]
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c', finalize=True)
+                        element_justification='c')
     cap = None
-    x = 0
-    
-    global camera_index
     if cap is None:
         cap = cv2.VideoCapture(camera_index)
-    while True:
+
+    src = base_game.current_round
+    while src == base_game.current_round:
         ret, frame = cap.read()
         if not ret:
             psg.popup_error("Camera not available.")
@@ -359,9 +357,8 @@ def sixthpage():
         frame = cv2.resize(frame, (194, 144))
         imgbytes = cv2.imencode(".png", frame)[1].tobytes()
 
-        window["image"].update(data=imgbytes)
-
         event, values = window.read(timeout=100)
+        window["image"].update(data=imgbytes)
         if event == psg.WIN_CLOSED or event == "Exit":
             cap.release()
             cap = None
@@ -381,6 +378,7 @@ def sixthpage():
                     
     window.close()
     Closed.set()
+
 
 def seventhpage():
     global window
@@ -740,5 +738,5 @@ def twelfth():
             eleventhpage()
     window.close()
 
-# threading.Thread(target=sixthpage).start()
+firstpage()
 # threading.Thread(target=request_put, args=(3, 'X')).start()
