@@ -1,20 +1,25 @@
 import PySimpleGUI as psg
 import cv2
 import threading
-import queue
+
+import base_game
+from base_game import *
 
 from PySimpleGUI import WIN_CLOSED
 
 bgclr = 'light blue'
+
 camera_index = 1
-queue = queue.Queue()
+position = None
 window = None
 win = None
 buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+Closed = threading.Event()
+Ended = threading.Event()
 
 def firstpage():
-    global window
+    global window, position
     b1 = psg.Button("Login", size=(30, 2))
     b2 = psg.Button("Register", size=(30, 2))
     b3 = psg.Button("Play as Guest", size=(30, 2))
@@ -34,9 +39,11 @@ def firstpage():
               [space3],
               [psg.Column(col3, background_color=bgclr, justification='r'), text3]]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c')
+                        element_justification='c', finalize=True)
+
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
+        position = window.current_location()
         if event in (None, 'Exit'):
             break
         elif event == 'Login':
@@ -289,12 +296,6 @@ def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
         window[tmp].update(image_filename='O.png')
 
 
-def request_put(pos, letter):
-    msg = f'{pos} {letter}'
-    queue.put(msg)
-    print('requested')
-
-
 def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
     global window
     if outcome == 0:
@@ -304,7 +305,9 @@ def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
 
 
 def sixthpage():
-    global window
+    global window, position
+    
+    Closed.clear()
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -342,48 +345,42 @@ def sixthpage():
                         element_justification='c', finalize=True)
     cap = None
     x = 0
+    
+    global camera_index
+    if cap is None:
+        cap = cv2.VideoCapture(camera_index)
     while True:
-        event, values = window.read(timeout=100)
-        global camera_index
-        if cap is None:
-            cap = cv2.VideoCapture(camera_index)
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                psg.popup_error("Camera not available.")
-                cap.release()
-                cap = None
-                break
-            frame = cv2.resize(frame, (194, 144))
-            imgbytes = cv2.imencode(".png", frame)[1].tobytes()
-
-            window["image"].update(data=imgbytes)
-
-            event, values = window.read(timeout=20)
-            if event == psg.WIN_CLOSED or event == "Exit":
-                cap.release()
-                cap = None
-                break
-            elif not queue.empty():  # Berakja a varakozasban levo lepest
-                raw = queue.get()
-                raw = raw.split()
-                pos = int(raw[0])
-                letter = raw[1]
-                put_on_window(pos, letter)
-            else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
-                for i in range(1, 10):
-                    tmp = f'-{i}-'
-                    if event == tmp and buttons[i - 1] == 0:
-                        letter = 'O'
-                        if x:
-                            letter = 'X'
-                        put_on_window(i, letter)
-                        x = not x
-                        break
-        if event == psg.WIN_CLOSED or event == "Exit":
+        ret, frame = cap.read()
+        if not ret:
+            psg.popup_error("Camera not available.")
+            cap.release()
+            cap = None
             break
-    window.close()
+        frame = cv2.resize(frame, (194, 144))
+        imgbytes = cv2.imencode(".png", frame)[1].tobytes()
 
+        window["image"].update(data=imgbytes)
+
+        event, values = window.read(timeout=100)
+        if event == psg.WIN_CLOSED or event == "Exit":
+            cap.release()
+            cap = None
+            break
+        elif not queue.empty():  # Berakja a varakozasban levo lepest a grafikus feluletre
+            raw = queue.get()
+            raw = raw.split()
+            pos = int(raw[0])
+            letter = raw[1]
+            put_on_window(pos, letter)
+        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt kerjuk feldolgozasra
+            for i in range(1, 10):
+                tmp = f'-{i}-'
+                if event == tmp:  # and window[tmp].get_text() == ''
+                    request_put(i, 3)  # Azert 3 hogy lekezelje, hogy Ha player1, ha player2, mukodjon
+                    break
+                    
+    window.close()
+    Closed.set()
 
 def seventhpage():
     global window
@@ -743,7 +740,5 @@ def twelfth():
             eleventhpage()
     window.close()
 
-
 # threading.Thread(target=sixthpage).start()
 # threading.Thread(target=request_put, args=(3, 'X')).start()
-firstpage()

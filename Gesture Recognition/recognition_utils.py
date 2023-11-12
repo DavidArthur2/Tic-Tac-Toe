@@ -131,7 +131,7 @@ def draw_frame(frame, hand_x, hand_y, show_pos=False, show_segment=False, show_h
         return False
 
 
-def get_angle_between_fingers(mid_point, finger_1, finger_2):  # Ujra irni abc
+def get_angle_between_fingers(mid_point, finger_1, finger_2):
     try:
 
         f1 = (finger_1.x, finger_1.y)

@@ -5,6 +5,8 @@ class colors:
     WARNING = '\033[93m'
     ERROR = '\033[91m'
     ENDC = '\033[0m'
+
+
 def sendError(header,raw_message,level=1):
     #Header - cimzés,Message - üzenet, Level - fokozat: 0 warning, 1 error, 2 error kilépéssel
     time_format = datetime.datetime.now().strftime("%H:%M:%S")
