@@ -305,79 +305,87 @@ def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
 
 def sixthpage():
     global window, position
-    
     Closed.clear()
-    text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    b1 = psg.Button('', key='-1-', button_color='white', image_filename='UI/background.png')
-    b2 = psg.Button('', key='-2-', button_color='white', image_filename='UI/background.png')
-    b3 = psg.Button('', key='-3-', button_color='white', image_filename='UI/background.png')
-    b4 = psg.Button('', key='-4-', button_color='white', image_filename='UI/background.png')
-    b5 = psg.Button('', key='-5-', button_color='white', image_filename='UI/background.png')
-    b6 = psg.Button('', key='-6-', button_color='white', image_filename='UI/background.png')
-    b7 = psg.Button('', key='-7-', button_color='white', image_filename='UI/background.png')
-    b8 = psg.Button('', key='-8-', button_color='white', image_filename='UI/background.png')
-    b9 = psg.Button('', key='-9-', button_color='white', image_filename='UI/background.png')
-    round1 = psg.Button('', key='1.round', button_color='white', image_filename='UI/roundX.png')
-    round2 = psg.Button('', key='2.round', button_color='white', image_filename='UI/roundCheck.png')
-    round3 = psg.Button('', key='3.round', button_color='white', image_filename='UI/roundBlank.png')
-    im = psg.Image(filename="", key="image")
-    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
-    space2 = psg.Text('', size=(30, 1), background_color=bgclr)
-    col1 = [[text1]]
-    col2 = [[b1], [b4], [b7]]
-    col3 = [[b2], [b5], [b8]]
-    col4 = [[b3], [b6], [b9]]
-    col5 = [[text4]]
-    layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
-              [psg.Column(col5, background_color=bgclr, justification='l'), round1, round2, round3],
-              [space1],
-              [psg.Column(col2, background_color=bgclr, justification='c'),
-               psg.Column(col3, background_color=bgclr, justification='c'),
-               psg.Column(col4, background_color=bgclr, justification='c')],
-              [space2],
-              [im]
-              ]
-    window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c')
-    cap = None
-    if cap is None:
-        cap = cv2.VideoCapture(camera_index)
+    try:
+        text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
+        text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
+        text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
+        text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
+        b1 = psg.Button('', key='-1-', button_color='white', image_filename='UI/background.png')
+        b2 = psg.Button('', key='-2-', button_color='white', image_filename='UI/background.png')
+        b3 = psg.Button('', key='-3-', button_color='white', image_filename='UI/background.png')
+        b4 = psg.Button('', key='-4-', button_color='white', image_filename='UI/background.png')
+        b5 = psg.Button('', key='-5-', button_color='white', image_filename='UI/background.png')
+        b6 = psg.Button('', key='-6-', button_color='white', image_filename='UI/background.png')
+        b7 = psg.Button('', key='-7-', button_color='white', image_filename='UI/background.png')
+        b8 = psg.Button('', key='-8-', button_color='white', image_filename='UI/background.png')
+        b9 = psg.Button('', key='-9-', button_color='white', image_filename='UI/background.png')
+        round1 = psg.Button('', key='1.round', button_color='white', image_filename='UI/roundX.png')
+        round2 = psg.Button('', key='2.round', button_color='white', image_filename='UI/roundCheck.png')
+        round3 = psg.Button('', key='3.round', button_color='white', image_filename='UI/roundBlank.png')
+        im = psg.Image(filename="", key="image")
+        space1 = psg.Text('', size=(30, 1), background_color=bgclr)
+        space2 = psg.Text('', size=(30, 1), background_color=bgclr)
+        col1 = [[text1]]
+        col2 = [[b1], [b4], [b7]]
+        col3 = [[b2], [b5], [b8]]
+        col4 = [[b3], [b6], [b9]]
+        col5 = [[text4]]
+        layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
+                  [psg.Column(col5, background_color=bgclr, justification='l'), round1, round2, round3],
+                  [space1],
+                  [psg.Column(col2, background_color=bgclr, justification='c'),
+                   psg.Column(col3, background_color=bgclr, justification='c'),
+                   psg.Column(col4, background_color=bgclr, justification='c')],
+                  [space2],
+                  [im]
+                  ]
+        window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
+                            element_justification='c')
+    except Exception as e:
+        sendError("Error in pages.py/sixthpage/Window-creation", str(e))
 
-    src = base_game.current_round
-    while src == base_game.current_round:
-        ret, frame = cap.read()
-        if not ret:
-            psg.popup_error("Camera not available.")
-            cap.release()
-            cap = None
-            break
-        frame = cv2.resize(frame, (194, 144))
-        imgbytes = cv2.imencode(".png", frame)[1].tobytes()
+    try:
+        cap = None
+        if cap is None:
+            cap = cv2.VideoCapture(camera_index)
 
-        event, values = window.read(timeout=100)
-        window["image"].update(data=imgbytes)
-        if event == psg.WIN_CLOSED or event == "Exit":
-            cap.release()
-            cap = None
-            break
-        elif not queue.empty():  # Berakja a varakozasban levo lepest a grafikus feluletre
-            raw = queue.get()
-            raw = raw.split()
-            pos = int(raw[0])
-            letter = raw[1]
-            put_on_window(pos, letter)
-        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt kerjuk feldolgozasra
-            for i in range(1, 10):
-                tmp = f'-{i}-'
-                if event == tmp:  # and window[tmp].get_text() == ''
-                    request_put(i, 3)  # Azert 3 hogy lekezelje, hogy Ha player1, ha player2, mukodjon
-                    break
-                    
-    window.close()
-    Closed.set()
+        src = base_game.current_round
+        while src == base_game.current_round:
+            if base_game.sig:  # Signal for restarting the round when it's TIE
+                base_game.sig = False
+                break
+            ret, frame = cap.read()
+            if not ret:
+                psg.popup_error("Camera not available.")
+                cap.release()
+                cap = None
+                break
+            frame = cv2.resize(frame, (194, 144))
+            imgbytes = cv2.imencode(".png", frame)[1].tobytes()
+
+            event, values = window.read(timeout=100)
+            window["image"].update(data=imgbytes)
+            if event == psg.WIN_CLOSED or event == "Exit":
+                cap.release()
+                break
+            elif not queue.empty():  # Puts the queued step on the GUI, which has a format of: pos letter
+                raw = queue.get()
+                raw = raw.split()
+                pos = int(raw[0])
+                letter = raw[1]
+                put_on_window(pos, letter)
+            else:  # If nothing happened, then we check if the player moved on the screen
+                for i in range(1, 10):
+                    tmp = f'-{i}-'
+                    if event == tmp:
+                        request_put(i, 3)  # 3 means will be valid either Player1 or Player2, nor PC
+                        break
+
+        window.close()
+        Closed.set()
+    except Exception as e:
+        sendError("Error in pages.py/sixthpage", str(e))
 
 
 def seventhpage():
@@ -738,5 +746,5 @@ def twelfth():
             eleventhpage()
     window.close()
 
-firstpage()
+
 # threading.Thread(target=request_put, args=(3, 'X')).start()

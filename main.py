@@ -12,11 +12,10 @@ import pyautogui
 import mouse_tracker
 
 
-
-
 if __name__ == '__main__':
     # threading.Thread(target=operate_recognition).start()
 
-    th=threading.Thread(target=start_match, args=(GAME_PVE,)).start()
+    # th = threading.Thread(target=start_match, args=(GAME_PVE,)).start()
     # threading.Thread(target=mouse_tracker.get_mouse_segment()).start()
+    pass
 
