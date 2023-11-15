@@ -1,8 +1,12 @@
 import PySimpleGUI as psg
 import cv2
 import threading
+import sys
+import os
 
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gesture Recognition'))
 import base_game
+import base_recognition
 from base_game import *
 from PySimpleGUI import WIN_CLOSED
 
@@ -12,10 +16,13 @@ camera_index = 0
 position = None
 window = None
 win = None
+prev_hover = 0
+hover = 0
 buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 Closed = threading.Event()
 Ended = threading.Event()
+
 
 def firstpage():
     global window, position
@@ -304,9 +311,10 @@ def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
 
 
 def sixthpage():
-    global window, position
+    global window, position, hover, prev_hover
     Closed.clear()
     try:
+        roundd = [None, None, None, None]
         text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
         text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
         text3 = psg.Text(text='Zoli74', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -320,9 +328,21 @@ def sixthpage():
         b7 = psg.Button('', key='-7-', button_color='white', image_filename='UI/background.png')
         b8 = psg.Button('', key='-8-', button_color='white', image_filename='UI/background.png')
         b9 = psg.Button('', key='-9-', button_color='white', image_filename='UI/background.png')
-        round1 = psg.Button('', key='1.round', button_color='white', image_filename='UI/roundX.png')
-        round2 = psg.Button('', key='2.round', button_color='white', image_filename='UI/roundCheck.png')
-        round3 = psg.Button('', key='3.round', button_color='white', image_filename='UI/roundBlank.png')
+        if base_game.current_round != 0:
+            for i in range(len(round_list)):
+                t = 'UI/roundBlank.png'
+                kei = f'{i}.round'
+                if round_list[i] != -1:
+                    if round_list[i] == PLAYER_ME:
+                        t = 'UI/roundCheck.png'
+                    elif round_list[i] == PLAYER_PC or round_list[i] == PLAYER_P2:
+                        t = 'UI/roundX.png'
+                roundd[i] = psg.Button('', key=kei, button_color='white', image_filename=t)
+        else:
+            roundd[1] = psg.Button('', key='1.round', button_color='white', image_filename='UI/roundBlank.png')
+            roundd[2] = psg.Button('', key='2.round', button_color='white', image_filename='UI/roundBlank.png')
+            roundd[3] = psg.Button('', key='3.round', button_color='white', image_filename='UI/roundBlank.png')
+
         im = psg.Image(filename="", key="image")
         space1 = psg.Text('', size=(30, 1), background_color=bgclr)
         space2 = psg.Text('', size=(30, 1), background_color=bgclr)
@@ -332,7 +352,7 @@ def sixthpage():
         col4 = [[b3], [b6], [b9]]
         col5 = [[text4]]
         layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
-                  [psg.Column(col5, background_color=bgclr, justification='l'), round1, round2, round3],
+                  [psg.Column(col5, background_color=bgclr, justification='l'), roundd[1], roundd[2], roundd[3]],
                   [space1],
                   [psg.Column(col2, background_color=bgclr, justification='c'),
                    psg.Column(col3, background_color=bgclr, justification='c'),
@@ -346,26 +366,43 @@ def sixthpage():
         sendError("Error in pages.py/sixthpage/Window-creation", str(e))
 
     try:
-        cap = None
-        if cap is None:
-            cap = cv2.VideoCapture(camera_index)
-
         src = base_game.current_round
         while src == base_game.current_round:
             if base_game.sig:  # Signal for restarting the round when it's TIE
                 base_game.sig = False
                 break
-            ret, frame = cap.read()
-            if not ret:
-                psg.popup_error("Camera not available.")
-                cap.release()
-                cap = None
-                break
-            frame = cv2.resize(frame, (194, 144))
-            imgbytes = cv2.imencode(".png", frame)[1].tobytes()
-
             event, values = window.read(timeout=100)
-            window["image"].update(data=imgbytes)
+            position = window.current_location()
+
+            if roundend_event.isSet():
+                roundend_event.clear()
+                r, _ = base_game.check_win()
+                if r != TIE:
+                    kei = f'{base_game.current_round}.round'
+                    t = 'UI/roundCheck.png'
+                    if base_game.round_list[base_game.current_round] == PLAYER_PC or base_game.round_list[base_game.current_round] == PLAYER_P2:
+                        t = 'UI/roundX.png'
+                    window[kei].update(image_filename=t)
+                else:
+                    kei = f'{base_game.current_round}.round'
+                    window[kei].update(image_filename='UI/roundBlank.png')
+            # 194, 144
+            if base_recognition.raw_frame is not None:
+                base_recognition.raw_frame = cv2.resize(base_recognition.raw_frame, (194, 144))
+                imgbytes = cv2.imencode(".png", base_recognition.raw_frame)[1].tobytes()
+                window["image"].update(data=imgbytes)
+
+            if prev_hover != hover and prev_hover != 0:
+                tmp = f'-{prev_hover}-'
+                window[tmp].update(button_color='white')
+                pass
+
+            if 0 < hover <= 9:
+                tmp = f'-{hover}-'
+                window[tmp].update(button_color='gray')
+                prev_hover = hover
+                pass
+
             if event == psg.WIN_CLOSED or event == "Exit":
                 cap.release()
                 break
@@ -745,6 +782,5 @@ def twelfth():
             window.close()
             eleventhpage()
     window.close()
-
 
 # threading.Thread(target=request_put, args=(3, 'X')).start()

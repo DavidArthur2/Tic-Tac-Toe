@@ -42,6 +42,7 @@ current_round = 0
 sig = False
 round_list = [-1, -1, -1, -1]
 match_ended = False
+roundend_event = threading.Event()
 board = [  # 0 ha üres,1 ha X, 2 ha O
     [0, 0, 0],
     [0, 0, 0],
@@ -252,6 +253,7 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
                     threading.Timer(2, next_round, args=(True,)).start()
                 elif res == 2:  # Successful, and ended, so comes the next round
                     round_list[current_round] = current_player
+                    roundend_event.set()
                     # TODO: Feldolgozni a nyerést a grafikus felületen, és az új kör kezdetét
                     threading.Timer(2, next_round).start()
                     return 2
@@ -265,6 +267,7 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
                     threading.Timer(2, next_round, args=(True,)).start()
                 elif res == 2:  # Successful, and ended, so comes the next round
                     round_list[current_round] = current_player
+                    roundend_event.set()
                     # TODO: Feldolgozni a nyerést a grafikus felületen, és az új kör kezdetét
                     threading.Timer(2, next_round).start()
                     return 1
