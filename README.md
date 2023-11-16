@@ -21,5 +21,8 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
+
+Note: On Linux, run ```sudo apt-get install python3-tk``` to install tkinter. 
+
 # Run the app:
 ```python main.py``` or F5 on main.py
