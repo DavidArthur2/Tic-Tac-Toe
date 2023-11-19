@@ -21,7 +21,7 @@ def sendError(header, raw_message, level=1):
     print(f'{curr_color}{header}{colors.ENDC}')
 
     try:
-        log_file = open("../log.txt", "a")
+        log_file = open("./log.txt", "a")
         log_file.write(msg)
         log_file.close()
     except:

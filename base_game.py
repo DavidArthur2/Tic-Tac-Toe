@@ -60,7 +60,7 @@ def clear_board(r=False):
         board_counter = 0
         if r:
             current_round = 0
-        if not queue.empty():
+        while not queue.empty():
             queue.get()
     except Exception as e:
         sendError("Error in base_game.py/clear_board", str(e))
@@ -205,7 +205,9 @@ def next_round(tie=False):
             current_player = starting_player = switch_player(starting_player)
             print(f'The starting player is {decode_player(current_player)}\n')
             if current_player == PLAYER_PC:
-                threading.Thread(target=request_random_step).start()
+                a = threading.Thread(target=request_random_step)
+                a.start()
+                a.join()
             return
         elif current_round == 3:  # Game end
             p1_won = 0
@@ -227,8 +229,6 @@ def next_round(tie=False):
         if current_player == PLAYER_PC:
             threading.Thread(target=request_random_step).start()
         print(f'The starting player is: {decode_player(current_player)}\n')
-
-        # TODO: Betolteni ujra a 6.os oldalt, megvaltoztatva a roundlistet [roundlist] szerint
     except Exception as e:
         sendError("Error in base_game.py/next_round", str(e))
 
@@ -247,14 +247,14 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
             if current_player == PLAYER_ME:
                 if res == 1:  # Successful, so PC turn
                     current_player = switch_player(current_player)
-                    threading.Thread(target=request_random_step).start()  # To be replaced with the Maximal algorithm function
+                    threading.Thread(target=request_random_step).start()  # TODO: To be replaced with the Maximal algorithm function
                     return 1
                 elif res == 2 and win == TIE:
-                    threading.Timer(2, next_round, args=(True,)).start()
+                    t = threading.Timer(2, next_round, args=(True,))
+                    t.start()
                 elif res == 2:  # Successful, and ended, so comes the next round
                     round_list[current_round] = current_player
                     roundend_event.set()
-                    # TODO: Feldolgozni a nyerést a grafikus felületen, és az új kör kezdetét
                     threading.Timer(2, next_round).start()
                     return 2
                 return res
@@ -264,11 +264,13 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
                     # TODO: Grafikus feluleten megjeleniteni, hogy a Player1 jon
                     return 1
                 elif res == 2 and win == TIE:
-                    threading.Timer(2, next_round, args=(True,)).start()
+                    t = threading.Timer(2, next_round, args=(True,))
+                    t.start()
+                    t.join()
+                    print("ended")
                 elif res == 2:  # Successful, and ended, so comes the next round
                     round_list[current_round] = current_player
                     roundend_event.set()
-                    # TODO: Feldolgozni a nyerést a grafikus felületen, és az új kör kezdetét
                     threading.Timer(2, next_round).start()
                     return 1
                 return res
@@ -280,7 +282,6 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
                 threading.Timer(2, next_round, args=(True,)).start()
             elif res == 2:  # Successful, and ended, so comes the next round
                 round_list[current_round] = current_player
-                # TODO: Feldolgozni a nyerést a grafikus felületen, és az új kör kezdetét
                 threading.Timer(2, next_round).start()
                 return 2
             return res

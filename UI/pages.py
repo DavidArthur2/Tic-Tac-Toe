@@ -404,8 +404,8 @@ def sixthpage():
                 pass
 
             if event == psg.WIN_CLOSED or event == "Exit":
-                cap.release()
                 break
+
             elif not queue.empty():  # Puts the queued step on the GUI, which has a format of: pos letter
                 raw = queue.get()
                 raw = raw.split()

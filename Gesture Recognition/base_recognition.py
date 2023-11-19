@@ -1,5 +1,3 @@
-import profile
-
 import cv2  # Képfeldolgozásra használt könyvtár
 import mediapipe as mp  # Képfelismerésre használt könyvtár -- Tartalmazza a TensorFlowot
 from utils.error import *
@@ -17,7 +15,7 @@ raw_frame = None
 camInitialized = threading.Event()
 hand_segm = 0
 
-detection_confidence = 0.5
+detection_confidence = 0.7
 tracking_confidence = 0.5
 
 
@@ -85,10 +83,13 @@ def process_frame(frame):
 def stop_recognition():
     try:
         cam.release()
-        hands_detector.close()
+        if hands_detector is not None:
+            hands_detector.close()
         cv2.destroyAllWindows()
 
         print("Resources released successfully!")
+    except AttributeError as _:
+        pass
     except Exception as e:
         utils.error.sendError("Error in base_recognition.py",
                               "Something went wrong in stop_recognition function! " + str(e))
