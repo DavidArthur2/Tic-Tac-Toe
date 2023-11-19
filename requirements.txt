@@ -1,0 +1,4 @@
+PySimpleGUI
+opencv-python
+mediapipe
+pyautogui
