@@ -1,5 +1,3 @@
-import profile
-
 import cv2  # Képfeldolgozásra használt könyvtár
 import mediapipe as mp  # Képfelismerésre használt könyvtár -- Tartalmazza a TensorFlowot
 from utils.error import *
@@ -13,8 +11,11 @@ stop_program = False
 
 
 cam = None
+raw_frame = None
+camInitialized = threading.Event()
+hand_segm = 0
 
-detection_confidence = 0.5
+detection_confidence = 0.7
 tracking_confidence = 0.5
 
 
@@ -49,23 +50,27 @@ def capture_frame():
 
 
 def process_frame(frame):
-    global stop_program
+    global stop_program, raw_frame, hand_segm
 
     try:
         cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = cv2.flip(frame, 1)  # Mirroring the camera
+        raw_frame = frame.copy()
 
         rec_img = hands_detector.process(frame)
 
         if rec_img.multi_hand_landmarks:
             hand_landmarks = rec_img.multi_hand_landmarks[0]
-            gesture = recognize_gesture(hand_landmarks, frame)
-            print(gesture)
+            gesture, hand_segm = recognize_gesture(hand_landmarks, frame)
+            # print(gesture)
+        else:
+            gesture = 0
+            hand_segm = 0
 
         cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         # h, w = get_cam_size()
         # cv2.resize(frame, (w, h))
-        cv2.imshow("Kep", frame)
+        # cv2.imshow("Kep", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             stop_program = True
@@ -78,21 +83,26 @@ def process_frame(frame):
 def stop_recognition():
     try:
         cam.release()
-        hands_detector.close()
+        if hands_detector is not None:
+            hands_detector.close()
         cv2.destroyAllWindows()
 
         print("Resources released successfully!")
+    except AttributeError as _:
+        pass
     except Exception as e:
         utils.error.sendError("Error in base_recognition.py",
                               "Something went wrong in stop_recognition function! " + str(e))
 
 
 def operate_recognition():
-    global hands_detector
+    global hands_detector, camInitialized
 
     # Initialize recognizer
+    camInitialized.clear()
     if not initialize_camera():
         return
+    camInitialized.set()
 
     # Start capturing and recognizing
     hands_detector = mp_hands.Hands(max_num_hands=1, min_detection_confidence=detection_confidence,
