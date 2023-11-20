@@ -9,6 +9,7 @@ import base_game
 import base_recognition
 from base_game import *
 from PySimpleGUI import WIN_CLOSED
+import client
 
 bgclr = 'light blue'
 
@@ -69,8 +70,8 @@ def secondpage():
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Username:', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Password:', font=('Algerian', 15), text_color='black', background_color=bgclr)
-    username = psg.Input(size=20, font=('Times New Roman', 14))
-    psw = psg.Input(password_char='*', size=20, font=('Times New Roman', 14))
+    username = psg.Input(key='username', size=20, font=('Times New Roman', 14))
+    psw = psg.Input(key='pass', password_char='*', size=20, font=('Times New Roman', 14))
     show_psw = psg.Button('Show Password')
     back = psg.Button('Back', size=(10, 1))
     space1 = psg.Text('', size=(30, 9), background_color=bgclr)
@@ -107,6 +108,8 @@ def secondpage():
             window.close()
             firstpage()
         elif event == 'Login':
+            client.connect_to_server()
+            client.auth(values['username'], values['pass'])
             window.close()
             fourthpage()
     window.close()

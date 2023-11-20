@@ -13,14 +13,15 @@ import mouse_tracker
 
 
 if __name__ == '__main__':
-    a = threading.Thread(target=operate_recognition)
-    a.start()
-    threading.Thread(target=mouse_tracker.get_hover_segment).start()
-    camInitialized.wait()
-    print('Cam initialized!')
-    th = threading.Thread(target=start_match, args=(GAME_PVE,))
-    th.start()
-    th.join()
-    stop_recognition()
-    exit(-1)
-    pass
+    # a = threading.Thread(target=operate_recognition)
+    # a.start()
+    # threading.Thread(target=mouse_tracker.get_hover_segment).start()
+    # camInitialized.wait()
+    # print('Cam initialized!')
+    # th = threading.Thread(target=start_match, args=(GAME_PVE,))
+    # th.start()
+    # th.join()
+    # stop_recognition()
+    # exit(-1)
+
+    pages.firstpage()
