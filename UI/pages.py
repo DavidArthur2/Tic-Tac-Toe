@@ -25,6 +25,7 @@ Closed = threading.Event()
 Ended = threading.Event()
 
 
+
 def firstpage():
     global window, position
     b1 = psg.Button("Login", size=(30, 2))
@@ -108,19 +109,26 @@ def secondpage():
             window.close()
             firstpage()
         elif event == 'Login':
-            client.connect_to_server()
             client.auth(values['username'], values['pass'])
-            window.close()
-            fourthpage()
+            while not client.May_Login:
+                continue
+            if client.May_Login == 1:
+                psg.popup_ok("Successful login!", font=16)
+                window.close()
+                fourthpage()
+            elif client.May_Login == 2:
+                psg.popup_ok("Incorrect credentials!", font=16, text_color='red')
+                continue
+
     window.close()
 
 
 def thirdpage():
     global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
-    username = psg.Input(size=20, font=('Times New Roman', 14))
-    psw = psg.Input(password_char='*', size=20, font=('Times New Roman', 14), key='-psw-')
-    con_psw = psg.Input(password_char='*', size=20, font=('Times New Roman', 14), key='-conpsw-')
+    username = psg.Input(key='username', size=20, font=('Times New Roman', 14))
+    psw = psg.Input(key='psw', password_char='*', size=20, font=('Times New Roman', 14))
+    con_psw = psg.Input(key='conpsw', password_char='*', size=20, font=('Times New Roman', 14))
     show_psw = psg.Button('Show Password')
     back = psg.Button('Back', size=(10, 1))
     space1 = psg.Text('', size=(30, 5), background_color=bgclr)
@@ -165,12 +173,20 @@ def thirdpage():
             window.close()
             firstpage()
         elif event == 'Register':
-            if values['-psw-'] != values['-conpsw-']:
+            if values['psw'] != values['conpsw']:
                 psg.popup_error("Passwords not matching!", font=16)
                 continue
             else:
-                window.close()
-                fourthpage()
+                client.auth(values['username'], values['psw'], reg=True)
+                while not client.May_Login:
+                    continue
+                if client.May_Login == 1:
+                    psg.popup_ok("Successful register!", font=16)
+                    window.close()
+                    fourthpage()
+                elif client.May_Login == 2:
+                    psg.popup_ok("Username already taken!", font=16, text_color='red')
+                    continue
     window.close()
 
 
@@ -217,6 +233,7 @@ def fourthpage():
         if event in (None, 'Exit'):
             break
         elif event == 'Logout':
+            client.May_Login = 0
             window.close()
             firstpage()
         elif event == 'PVP':

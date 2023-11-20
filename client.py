@@ -1,11 +1,13 @@
 import socket
 import threading
 import time
-
+import re
 import ping3
 
 
 server_socket: socket.socket = None
+May_Login = 0  # 0 - waiting, 1 succesful, 2 unsucc/username taken
+listen_stop_flag = threading.Event()
 
 
 def check_internet_connection():
@@ -20,18 +22,42 @@ def check_internet_connection():
             print("Error:", e)
 
 
+def stop_connection():
+    listen_stop_flag.set()
+
+
+def process_msg(msg):
+    global May_Login
+
+    if msg == 'auth suc':
+        May_Login = 1
+    elif msg == 'auth inc':
+        May_Login = 2
+
+
 def listen_to_server():
-    while True:
-        data = server_socket.recv(1024)
+    while not listen_stop_flag.is_set():
+        try:
+            data = server_socket.recv(1024)
+            if not data:
+                raise ConnectionResetError
 
-        if not data:  # If connection is closed
+            print("Received from server: {}".format(data.decode('utf-8')))
+            process_msg(data.decode('utf-8'))
+        except TimeoutError:
+            pass
+        except ConnectionResetError:
+            print('The server stopped working!')
             break
+    server_socket.close()
+    print('Listening to the server stopped, and disconnected from the server!')
 
-        print("Received from server: {}".format(data.decode('utf-8')))
 
-
-def auth(username, password):
-    server_socket.send(f'auth: {username} {password}'.encode())
+def auth(username, password, reg=False):
+    if reg:
+        server_socket.send(f'auth-reg: {username} {password}'.encode())
+    else:
+        server_socket.send(f'auth: {username} {password}'.encode())
 
 
 def send_message(msg):
@@ -39,9 +65,11 @@ def send_message(msg):
 
 
 def connect_to_server(hostname=socket.gethostname(), port=3356):
-    global server_socket
+    global server_socket, listen_th
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(1)
 
+    listen_stop_flag.clear()
     threading.Thread(target=check_internet_connection).start()
 
     try:
@@ -54,6 +82,7 @@ def connect_to_server(hostname=socket.gethostname(), port=3356):
         print("An error occurred:", e)
         return None
 
-    threading.Thread(target=listen_to_server).start()
+    listen_th = threading.Thread(target=listen_to_server)
+    listen_th.start()
     return 1
 

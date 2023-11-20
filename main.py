@@ -10,6 +10,7 @@ import pages
 from base_game import start_match, GAME_PVE, GAME_SAMEPC, GAME_PVP
 import pyautogui
 import mouse_tracker
+import client
 
 
 if __name__ == '__main__':
@@ -23,5 +24,5 @@ if __name__ == '__main__':
     # th.join()
     # stop_recognition()
     # exit(-1)
-
+    threading.Thread(target=client.connect_to_server).start()
     pages.firstpage()
