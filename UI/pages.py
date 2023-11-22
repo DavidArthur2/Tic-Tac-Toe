@@ -21,9 +21,13 @@ prev_hover = 0
 hover = 0
 buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+player_name = None
+
 Closed = threading.Event()
 Ended = threading.Event()
 
+Accepted = threading.Event()
+Got_Inv = threading.Event()
 
 
 def firstpage():
@@ -61,13 +65,14 @@ def firstpage():
             window.close()
             thirdpage()
         elif event == 'Play as Guest':
+            continue
             window.close()
             fourthpage()
     window.close()
 
 
 def secondpage():
-    global window
+    global window, player_name
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Username:', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Password:', font=('Algerian', 15), text_color='black', background_color=bgclr)
@@ -114,6 +119,7 @@ def secondpage():
                 continue
             if client.May_Login == 1:
                 psg.popup_ok("Successful login!", font=16)
+                player_name = values['username']
                 window.close()
                 fourthpage()
             elif client.May_Login == 2:
@@ -124,7 +130,7 @@ def secondpage():
 
 
 def thirdpage():
-    global window
+    global window, player_name
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     username = psg.Input(key='username', size=20, font=('Times New Roman', 14))
     psw = psg.Input(key='psw', password_char='*', size=20, font=('Times New Roman', 14))
@@ -182,6 +188,7 @@ def thirdpage():
                     continue
                 if client.May_Login == 1:
                     psg.popup_ok("Successful register!", font=16)
+                    player_name = values['username']
                     window.close()
                     fourthpage()
                 elif client.May_Login == 2:
@@ -294,9 +301,14 @@ def fifthpage():
                         element_justification='c')
 
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
+        elif Got_Inv.is_set():
+            p = psg.popup_ok_cancel('laci meghivott jatszani!', 'jatek')
+            if p:
+                client.send_message('accept game')
+                Got_Inv.clear()
         elif event == 'Back':
             window.close()
             fourthpage()
@@ -309,6 +321,9 @@ def fifthpage():
                 tenthpage()
             else:
                 sixthpage()
+        if Accepted.is_set():
+            start_match(GAME_PVP)
+            Accepted.clear()
     window.close()
 
 
@@ -436,7 +451,12 @@ def sixthpage():
                 for i in range(1, 10):
                     tmp = f'-{i}-'
                     if event == tmp:
-                        request_put(i, 3)  # 3 means will be valid either Player1 or Player2, nor PC
+                        if game_type == GAME_PVE:
+                            request_put(i, PLAYER_ME)  # 3 means will be valid either Player1 or Player2, nor PC
+                        elif game_type == GAME_SAMEPC:
+                            request_put(i, base_game.current_player)
+                        elif game_type == GAME_PVP:
+                            request_put(i, PLAYER_ME)
                         break
 
         window.close()
@@ -653,10 +673,10 @@ def ninthpage():
             fifthpage()
         if event == 'P1':
             window.close()
-            if camera_index is None:
-                tenthpage()
-            else:
-                sixthpage()
+            Accepted.clear()
+            client.send_message('req game Zoli74')
+            eleventhpage()
+
     window.close()
 
 
@@ -748,12 +768,17 @@ def eleventhpage():
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c', finalize=True)
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
         elif event == 'Cancel':
             window.close()
             fourthpage()
+        if Accepted.is_set():
+            window.close()
+            start_match(GAME_PVP)
+            Accepted.clear()
+
     window.close()
 
 
@@ -802,5 +827,3 @@ def twelfth():
             window.close()
             eleventhpage()
     window.close()
-
-# threading.Thread(target=request_put, args=(3, 'X')).start()
