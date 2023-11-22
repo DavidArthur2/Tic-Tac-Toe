@@ -7,6 +7,8 @@ import time
 import threading
 import multiprocessing
 import pages
+
+import client
 from utils.error import sendError
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
@@ -236,18 +238,17 @@ def next_round(tie=False):
 def request_put(pos, player):  # A grafikus felulet ezt hivja meg
     try:
         global current_player
-        if player == 3:
-            player = PLAYER_ME if game_type == GAME_PVE else current_player
         if player != current_player:
             return 0
 
         res = put(pos, LETTER_X if starting_player == current_player else LETTER_O)
+
         win, _ = check_win()
         if game_type == GAME_PVE:
             if current_player == PLAYER_ME:
                 if res == 1:  # Successful, so PC turn
                     current_player = switch_player(current_player)
-                    threading.Thread(target=request_random_step).start()  # TODO: To be replaced with the Maximal algorithm function
+                    threading.Thread(target=request_random_step).start()  # TODO: To be replaced with the minimax algorithm function
                     return 1
                 elif res == 2 and win == TIE:
                     t = threading.Timer(2, next_round, args=(True,))
@@ -281,6 +282,26 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
             elif res == 2 and win == TIE:  # Successful, and tie, so restart the round
                 threading.Timer(2, next_round, args=(True,)).start()
             elif res == 2:  # Successful, and ended, so comes the next round
+                round_list[current_round] = current_player
+                threading.Timer(2, next_round).start()
+                return 2
+            return res
+        elif game_type == GAME_PVP:
+            if res == 1:  # Successful, so next player comes
+                if player == PLAYER_ME:
+                    client.send_message(f'move {pos}')
+                    client.enemy_move = True
+                current_player = switch_player(current_player)
+                return 1
+            elif res == 2 and win == TIE:  # Successful, and tie, so restart the round
+                if player == PLAYER_ME:
+                    client.send_message(f'move {pos}')
+                    client.enemy_move = True
+                threading.Timer(2, next_round, args=(True,)).start()
+            elif res == 2:  # Successful, and ended, so comes the next round
+                if player == PLAYER_ME:
+                    client.send_message(f'move {pos}')
+                    client.enemy_move = True
                 round_list[current_round] = current_player
                 threading.Timer(2, next_round).start()
                 return 2
@@ -363,6 +384,21 @@ def start_match(gt):  # Game types: GAME_PVP,GAME_PVE,GAME_SAMEPC; 3 round games
 
         elif game_type == GAME_SAMEPC:
             starting_player = random.randint(PLAYER_ME, PLAYER_P2)
+            current_player = starting_player
+
+            print(f'The game has started! Starting player is: {decode_player(current_player)}\n')
+
+            pages.Ended.clear()
+            pages.sixthpage()  # Calls GUI
+            while True:  # This is used to reopen the GUI, because it can be called only from the main-loop
+                pages.Closed.wait()
+                if not match_ended:
+                    pages.sixthpage()  # Calls GUI
+                else:
+                    break
+            print('The match has ended!')
+
+        elif game_type == GAME_PVP:
             current_player = starting_player
 
             print(f'The game has started! Starting player is: {decode_player(current_player)}\n')
