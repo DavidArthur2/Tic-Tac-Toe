@@ -451,11 +451,11 @@ def sixthpage():
                 for i in range(1, 10):
                     tmp = f'-{i}-'
                     if event == tmp:
-                        if game_type == GAME_PVE:
+                        if base_game.game_type == GAME_PVE:
                             request_put(i, PLAYER_ME)  # 3 means will be valid either Player1 or Player2, nor PC
-                        elif game_type == GAME_SAMEPC:
+                        elif base_game.game_type == GAME_SAMEPC:
                             request_put(i, base_game.current_player)
-                        elif game_type == GAME_PVP:
+                        elif base_game.game_type == GAME_PVP:
                             request_put(i, PLAYER_ME)
                         break
 

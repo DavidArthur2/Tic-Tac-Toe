@@ -238,6 +238,7 @@ def next_round(tie=False):
 def request_put(pos, player):  # A grafikus felulet ezt hivja meg
     try:
         global current_player
+        print(player,current_player)
         if player != current_player:
             return 0
 
