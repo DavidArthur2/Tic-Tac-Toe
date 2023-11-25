@@ -465,34 +465,73 @@ def sixthpage():
         sendError("Error in pages.py/sixthpage", str(e))
 
 
-def seventhpage():
-    global window
+leaderboard_list = [['Zoli74', 'Marci52', 'Jancsi', 'Arhur', 'Levi', 'Arnold', 'Janos', 'Jozsi', 'Robi', 'James'],
+                    ['Jane', 'Adri', 'Valaki', 'Megvalaki'],
+                    ['teszt1', 'teszt2']]
+list_page = 0
+leaderboard_rank = 1
+
+
+def update_leaderboard():
+    global window, leaderboard_list, list_page, leaderboard_rank
     text1 = psg.Text(text='Leaderboard: ', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text2 = psg.Text(text='1.', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='Zoli74', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    text4 = psg.Text(text='2.', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    text5 = psg.Text(text='Marci52', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    b1 = psg.Button('Back', size=(10, 1))
-    space1 = psg.Text('', size=(30, 5), background_color=bgclr)
+    b1 = psg.Button('Back', size=(10, 1), key='-back-')
+    right_arrow = psg.Button('', image_filename='UI/right_arrow.png', key='-right-')
+    left_arrow = psg.Button('', image_filename='UI/left_arrow.png', key='-left-')
+    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
+    space2 = psg.Text('', size=(5, 1), background_color=bgclr)
+    space3 = psg.Text('', size=(5, 1), background_color=bgclr)
+    space4 = psg.Text('', size=(5, 1), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[text2]]
-    col3 = [[text4]]
+    col2 = [[psg.Text(text=user, font=('Algerian', 20), text_color='black', background_color=bgclr)]
+            for user in leaderboard_list[list_page]]
+    col3 = [[psg.Text(text=f'{rank}.', font=('Algerian', 20), text_color='black', background_color=bgclr)]
+            for rank in range(leaderboard_rank, len(leaderboard_list[list_page]) + leaderboard_rank)]
+    if len(leaderboard_list[list_page]) != 10:
+        col2 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]
+                 for i in range(1, 11-len(leaderboard_list[list_page]))]
+        col3 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]
+                 for i in range(1, 11-len(leaderboard_list[list_page]))]
+    col2 += [[space3], [right_arrow]]
+    col3 += [[space4], [left_arrow]]
     col4 = [[b1]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c')],
-              [psg.Column(col2, background_color=bgclr, justification='l'), text3],
-              [psg.Column(col3, background_color=bgclr, justification='l'), text5],
+              [psg.Column(col3, background_color=bgclr, justification='c'),
+               space2,
+               psg.Column(col2, background_color=bgclr, justification='c')],
               [space1],
               [psg.Column(col4, background_color=bgclr, justification='r')]
               ]
+    window.close()
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c')
+
+
+def seventhpage():
+    global window, leaderboard_list, list_page, leaderboard_rank
+    window = psg.Window('Tic-Tac-Toe')
+    update_leaderboard()
     while True:
         event, values = window.read()
         if event in (None, 'Exit'):
+            leaderboard_rank = 1
+            list_page = 0
             break
-        elif event == 'Back':
+        elif event == '-back-':
+            leaderboard_rank = 1
+            list_page = 0
             window.close()
             fourthpage()
+        elif event == '-right-':
+            if leaderboard_list[list_page+1] is not None:
+                leaderboard_rank += len(leaderboard_list[list_page])
+                list_page += 1
+                update_leaderboard()
+        elif event == '-left-':
+            if leaderboard_list[list_page-1] is not None:
+                list_page -= 1
+                leaderboard_rank -= len(leaderboard_list[list_page])
+                update_leaderboard()
     window.close()
 
 
