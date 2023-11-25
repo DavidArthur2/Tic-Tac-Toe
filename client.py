@@ -17,6 +17,8 @@ listen_stop_flag = threading.Event()
 SERVER_PORT = 3356
 SERVER_IP = socket.gethostname()
 
+all_player_list = []
+
 enemy_move = False
 
 
@@ -37,7 +39,7 @@ def stop_connection():
 
 
 def process_msg(msg):
-    global May_Login
+    global May_Login, all_player_list
 
     if msg == 'auth suc':  # Successful authentication, can log in
         May_Login = 1
@@ -64,6 +66,22 @@ def process_msg(msg):
     if m:
         segm = int(m.group(1))
         base_game.request_put(segm, PLAYER_P2)
+
+    m = re.match(r'^all-players: (.*)', msg)
+    if m:
+        tmp = m.group(1).split(' ')
+        nb = len(tmp)
+        remain = nb % 10
+        page = []
+        for a in tmp:
+            page.append(a)
+            if len(page) % 10 == 0 and len(page) != 0:
+                all_player_list.append(page)
+                page.clear()
+        for i in range(remain):
+            page.append(' ')
+
+        all_player_list.append(page)
 
 
 def listen_to_server():
