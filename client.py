@@ -8,7 +8,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 import pages
-import base_game
+from base_game import *
 from utils.error import sendError
 
 
