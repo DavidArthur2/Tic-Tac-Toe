@@ -194,6 +194,10 @@ def switch_player(p):
         if p == PLAYER_ME:
             return PLAYER_P2
         return PLAYER_ME
+    if game_type == GAME_PVP:
+        if p == PLAYER_ME:
+            return PLAYER_P2
+        return PLAYER_ME
     return PLAYER_ME
 
 
