@@ -3,6 +3,8 @@ import threading
 import time
 import re
 import ping3
+import os
+import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 import pages
@@ -56,16 +58,16 @@ def process_msg(msg):
     if m:
         starter = m.group(1)
         if starter == pages.player_name:
-            base_game.starting_player = PLAYER_ME
+            base_game.starting_player = base_game.PLAYER_ME
         else:
-            base_game.starting_player = PLAYER_P2
+            base_game.starting_player = base_game.PLAYER_P2
         pages.Accepted.set()
 
     # During match, if the enemy moved
     m = re.match(r'^move ([0-9])', msg)
     if m:
         segm = int(m.group(1))
-        base_game.request_put(segm, PLAYER_P2)
+        base_game.request_put(segm, base_game.PLAYER_P2)
 
     m = re.match(r'^all-players: (.*)', msg)
     if m:
