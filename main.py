@@ -24,5 +24,5 @@ if __name__ == '__main__':
     # th.join()
     # stop_recognition()
     # exit(-1)
-    # threading.Thread(target=client.connect_to_server).start()
-    pages.ninthpage()
+    threading.Thread(target=client.connect_to_server).start()
+    pages.firstpage()
