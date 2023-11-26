@@ -15,6 +15,7 @@ from utils.error import sendError
 server_socket: socket.socket = None
 May_Login = 0  # 0 - waiting, 1 succesful, 2 unsucc/username taken
 listen_stop_flag = threading.Event()
+Connected_To_Server = threading.Event()
 
 SERVER_PORT = 3356
 SERVER_IP = socket.gethostname()
@@ -37,7 +38,10 @@ def check_internet_connection():
 
 
 def stop_connection():
-    listen_stop_flag.set()
+    if Connected_To_Server.is_set():
+        listen_stop_flag.set()
+    else:
+        print('You have been disconnected from the server!')
 
 
 def process_msg(msg):
@@ -45,12 +49,15 @@ def process_msg(msg):
 
     if msg == 'auth suc':  # Successful authentication, can log in
         May_Login = 1
+        send_message('get-rank')
+        send_message('get-online-player-nb')
     elif msg == 'auth inc':  # Authentication not successful, incorrect pass/username taken on register
         May_Login = 2
 
     # If the player got an invitation
     m = re.match(r'game inv ([a-zA-Z0-9]+)', msg)
     if m:
+        pages.enemy_name = m.group(1)
         pages.Got_Inv.set()
 
     # The signal of the starting of the game with the starting player
@@ -85,6 +92,14 @@ def process_msg(msg):
 
         all_player_list.append(page)
 
+    m = re.match(r'player-rank: ([0-9]*)', msg)
+    if m:
+        pages.player_rank = int(m.group(1))
+
+    m = re.match(r'online-player-nb: ([0-9]*)', msg)
+    if m:
+        pages.online_players = int(m.group(1))
+
 
 def listen_to_server():
     while not listen_stop_flag.is_set():
@@ -94,7 +109,10 @@ def listen_to_server():
                 raise ConnectionResetError
 
             print("Received from server: {}".format(data.decode('utf-8')))
-            process_msg(data.decode('utf-8'))
+            tmp = data.decode().split('\n')
+            for msg in tmp:
+                process_msg(msg)
+
         except TimeoutError:
             pass
         except ConnectionResetError:
@@ -102,7 +120,6 @@ def listen_to_server():
             break
     server_socket.close()
     print('You have been disconnected from the server!')
-    exit(-1)
 
 
 def auth(username, password, reg=False):
@@ -133,6 +150,8 @@ def connect_to_server():
     try:
         server_socket.connect((SERVER_IP, SERVER_PORT))
         print(f"Connection to the server({SERVER_IP}:{SERVER_PORT}) was successful!")
+        Connected_To_Server.set()
+        send_message('get-online-player-nb')
     except ConnectionRefusedError as e:
         sendError('An error occured in client.py/connect_to_server', 'Connection refused by the server! ' + str(e))
         return None
