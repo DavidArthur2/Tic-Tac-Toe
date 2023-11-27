@@ -33,14 +33,18 @@ players_list = [[('Zoli74', 2), ('Marci52', 5), ('Jancsi', 1), ('Arhur', 7), ('L
 players_online_page = 0
 
 player = ''
-
-player_name = None
+player_name = 'UN'
+player_rank = -1
+enemy_name = 'UN'
+online_players = -1
 
 Closed = threading.Event()
 Ended = threading.Event()
 
 Accepted = threading.Event()
 Got_Inv = threading.Event()
+
+Wait_For_Request = threading.Event()
 
 
 def firstpage():
@@ -50,7 +54,11 @@ def firstpage():
     b3 = psg.Button("Play as Guest", size=(30, 2))
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Players online: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='10', font=('Algerian', 15), text_color='black', background_color=bgclr)
+    timeout = 0
+    while online_players == -1 and timeout < 100:
+        time.sleep(0.1)
+        timeout += 1
+    text3 = psg.Text(text=f'{online_players}', font=('Algerian', 15), text_color='black', background_color=bgclr)
     space = psg.Text('', size=(30, 8), background_color=bgclr)
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     space2 = psg.Text('', size=(30, 1), background_color=bgclr)
@@ -68,7 +76,6 @@ def firstpage():
 
     while True:
         event, values = window.read(timeout=100)
-        position = window.current_location()
         if event in (None, 'Exit'):
             break
         elif event == 'Login':
@@ -127,11 +134,15 @@ def secondpage():
             window.close()
             firstpage()
         elif event == 'Login':
+            if not client.Connected_To_Server.is_set():  #Needed connection with the server first!
+                psg.popup_ok('Server unreachable!', 'You are not connected to the server!\nCheck your internet connection, and restart the game!')
+                continue
+
             client.auth(values['username'], values['pass'])
             while not client.May_Login:
                 continue
             if client.May_Login == 1:
-                psg.popup_ok("Successful login!", font=16)
+                psg.popup_ok(f"Successful login!\nWelcome {values['username']}!", font=16)
                 player_name = values['username']
                 window.close()
                 fourthpage()
@@ -192,15 +203,19 @@ def thirdpage():
             window.close()
             firstpage()
         elif event == 'Register':
+            if not client.Connected_To_Server.is_set():  #Needed connection with the server first!
+                psg.popup_ok('Server unreachable!', 'You are not connected to the server!\nCheck your internet connection, and restart the game!')
+                continue
+
             if values['psw'] != values['conpsw']:
-                psg.popup_error("Passwords not matching!", font=16)
+                psg.popup_ok("Passwords are not matching!", font=16)
                 continue
             else:
                 client.auth(values['username'], values['psw'], reg=True)
-                while not client.May_Login:
+                while not client.May_Login:  # Wait for response from the server
                     continue
                 if client.May_Login == 1:
-                    psg.popup_ok("Successful register!", font=16)
+                    psg.popup_ok(f"Successful register!\nWelcome {values['username']}!", font=16)
                     player_name = values['username']
                     window.close()
                     fourthpage()
@@ -214,7 +229,11 @@ def fourthpage():
     global window
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Ranking: ', font=('Algerian', 13), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='21', font=('Algerian', 13), text_color='black', background_color=bgclr)
+    timeout = 0
+    while player_rank == -1 and timeout < 100:
+        time.sleep(0.1)
+        timeout += 1
+    text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 13), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='Mode: ', font=('Algerian', 25), text_color='black', background_color=bgclr)
     pve = psg.Button('PVE', size=(25, 2))
     pvp = psg.Button('PVP', size=(25, 2))
@@ -267,18 +286,7 @@ def fourthpage():
             eighthpage()
         elif event == 'PVE':
             window.close()
-            if camera_index is None:
-                tenthpage()
-            else:
-                sixthpage()
-        elif event == 'PopUp':
-            ch = psg.popup_yes_no("Zoli invited you, do you want to play ?", title="Invitation")
-            if ch == 'Yes':
-                window.close()
-                if camera_index is None:
-                    tenthpage()
-                else:
-                    sixthpage()
+            base_game.start_match(GAME_PVE)
     window.close()
 
 
@@ -286,7 +294,7 @@ def fifthpage():
     global window, player
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Ranking: ', font=('Algerian', 13), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='21', font=('Algerian', 13), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 13), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='How would you like to play ?', font=('Algerian', 15), text_color='black',
                      background_color=bgclr)
     b1 = psg.Button('Same PC', size=(30, 3))
@@ -317,11 +325,6 @@ def fifthpage():
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
-        elif Got_Inv.is_set():
-            p = psg.popup_ok_cancel('laci meghivott jatszani!', 'jatek')
-            if p:
-                client.send_message('accept game')
-                Got_Inv.clear()
         elif event == 'Back':
             window.close()
             fourthpage()
@@ -338,6 +341,7 @@ def fifthpage():
         if Accepted.is_set():
             start_match(GAME_PVP)
             Accepted.clear()
+            base_game.start_match(GAME_SAMEPC)
     window.close()
 
 
@@ -361,12 +365,16 @@ def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
 
 def sixthpage():
     global window, position, hover, prev_hover
-    Closed.clear()
+    if not queue.empty():
+        answ = ''
+        while not queue.empty():
+            answ += str(queue.get())
+        sendError('Warning in pages.py/sixthpage', 'Queue not empty on initializing page!\n'+answ, 0)
     try:
         roundd = [None, None, None, None]
         text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
         text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
-        text3 = psg.Text(text=player, font=('Algerian', 40), text_color='black', background_color=bgclr)
+        text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
         text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
         b1 = psg.Button('', key='-1-', button_color='white', image_filename='UI/background.png')
         b2 = psg.Button('', key='-2-', button_color='white', image_filename='UI/background.png')
@@ -417,10 +425,10 @@ def sixthpage():
     try:
         src = base_game.current_round
         while src == base_game.current_round:
+            event, values = window.read(timeout=100)
             if base_game.sig:  # Signal for restarting the round when it's TIE
                 base_game.sig = False
                 break
-            event, values = window.read(timeout=100)
             position = window.current_location()
 
             if roundend_event.isSet():
@@ -436,7 +444,7 @@ def sixthpage():
                     kei = f'{base_game.current_round}.round'
                     window[kei].update(image_filename='UI/roundBlank.png')
             # 194, 144
-            if base_recognition.raw_frame is not None:
+            if base_recognition.raw_frame is not None:  # Make image if it is initaialized and in use
                 base_recognition.raw_frame = cv2.resize(base_recognition.raw_frame, (194, 144))
                 imgbytes = cv2.imencode(".png", base_recognition.raw_frame)[1].tobytes()
                 window["image"].update(data=imgbytes)
@@ -465,11 +473,11 @@ def sixthpage():
                 for i in range(1, 10):
                     tmp = f'-{i}-'
                     if event == tmp:
-                        if game_type == GAME_PVE:
+                        if base_game.game_type == GAME_PVE:
                             request_put(i, PLAYER_ME)  # 3 means will be valid either Player1 or Player2, nor PC
-                        elif game_type == GAME_SAMEPC:
+                        elif base_game.game_type == GAME_SAMEPC:
                             request_put(i, base_game.current_player)
-                        elif game_type == GAME_PVP:
+                        elif base_game.game_type == GAME_PVP:
                             request_put(i, PLAYER_ME)
                         break
 
@@ -517,6 +525,10 @@ def update_leaderboard():
 def seventhpage():
     global window, leaderboard_list, list_page, leaderboard_rank
     window = psg.Window('Tic-Tac-Toe')
+    Wait_For_Request.clear()
+    client.send_message('get all players')
+    Wait_For_Request.wait()
+    
     update_leaderboard()
     while True:
         event, values = window.read()
@@ -725,6 +737,11 @@ def update_players_online():
 def ninthpage():
     global window, players_online_page, players_list, player
     window = psg.Window('Tic-Tac-Toe')
+    
+    Wait_For_Request.clear()
+    client.send_message('get online players')
+    Wait_For_Request.wait()
+    
     update_players_online()
     while True:
         event, values = window.read()
@@ -741,6 +758,7 @@ def ninthpage():
             window.close()
             Accepted.clear()
             client.send_message(f'req game {player}')
+            enemy_name = 'Zoli74'
             eleventhpage()
         elif event == 'P2':
             players_online_page = 0
@@ -806,7 +824,7 @@ def tenthpage():
     global window
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text=player, font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
     b1 = psg.Button('', key='-1-', button_color='white', image_filename='background.png')
     b2 = psg.Button('', key='-2-', button_color='white', image_filename='background.png')
@@ -870,7 +888,7 @@ def eleventhpage():
     global window, player
     text1 = psg.Text(text='Waiting', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='for', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text=player, font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='to', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text5 = psg.Text(text='Respond...', font=('Algerian', 40), text_color='black', background_color=bgclr)
     space1 = psg.Text('', size=(30, 7), background_color=bgclr)
@@ -897,7 +915,7 @@ def eleventhpage():
             ninthpage()
         if Accepted.is_set():
             window.close()
-            start_match(GAME_PVP)
+            base_game.start_match(GAME_PVP)
             Accepted.clear()
 
     window.close()
@@ -905,20 +923,20 @@ def eleventhpage():
 
 def twelfth():
     global win, window
-    win = 1
-    if win == 0:
+    win = True if current_player == PLAYER_ME else False
+    if win:
         text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
                          background_color='green', border_width=50)
     else:
         text1 = psg.Text(text='Defeat', font=('Algerian', 50), text_color='black',
                          background_color='red', border_width=50)
     text2 = psg.Text(text='New Rank:', font=('Algerian', 30), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='112', font=('Algerian', 30), text_color='black', background_color=bgclr)
+    text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 30), text_color='black', background_color=bgclr)
     space1 = psg.Text('', size=(30, 4), background_color=bgclr)
     space2 = psg.Text('', size=(30, 1), background_color=bgclr)
     space3 = psg.Text('', size=(30, 4), background_color=bgclr)
     space4 = psg.Text('', size=(30, 1), background_color=bgclr)
-    new_game = psg.Button('New Game', size=(25, 3))
+    new_game = psg.Button('Go to menu', size=(25, 3))
     rematch = psg.Button('Rematch', size=(25, 3))
     col1 = [[text1]]
     col2 = [[text2]]
@@ -946,5 +964,6 @@ def twelfth():
             fourthpage()
         elif event == 'Rematch':
             window.close()
-            eleventhpage()
+            fourthpage()
+            # eleventhpage() to be added
     window.close()

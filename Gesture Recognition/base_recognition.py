@@ -7,7 +7,7 @@ from recognition_utils import *
 
 # Default variables
 hands_detector = None  # A kepfelismero
-stop_program = False
+stop_cam = False
 
 
 cam = None
@@ -38,11 +38,11 @@ def initialize_camera():
 
 
 def capture_frame():
-    while cam.isOpened() and not stop_program:
+    while cam.isOpened() and not stop_cam:
 
         res, frame = cam.read()
 
-        if not res:
+        if not res and not stop_cam:
             sendError("Hiba a kamerával", "Megszakadt a kapcsolat a kamerával!")
             return False
 
@@ -50,7 +50,7 @@ def capture_frame():
 
 
 def process_frame(frame):
-    global stop_program, raw_frame, hand_segm
+    global stop_cam, raw_frame, hand_segm
 
     try:
         cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -73,7 +73,7 @@ def process_frame(frame):
         # cv2.imshow("Kep", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
-            stop_program = True
+            stop_recognition()
 
     except Exception as e:
         utils.error.sendError("Error in base_recognition.py",
@@ -81,7 +81,9 @@ def process_frame(frame):
 
 
 def stop_recognition():
+    global stop_cam
     try:
+        stop_cam = True
         cam.release()
         if hands_detector is not None:
             hands_detector.close()
