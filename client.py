@@ -80,7 +80,7 @@ def process_msg(msg):
         base_game.request_put(segm, base_game.PLAYER_P2)
         return
 
-    m = re.match(r'^all-players: (.*)', msg)
+    m = re.match(r'^all-players:(.*)', msg)
     if m:
         tmp = m.group(1).split(' ')
         nb = len(tmp)
@@ -99,7 +99,7 @@ def process_msg(msg):
         pages.Wait_For_Request.set()
         return
 
-    m = re.match(r'^online-players: (.*)', msg)
+    m = re.match(r'^online-players:(.*)', msg)
     if m:
         tmp = m.group(1).split(' ')
         nb = len(tmp)

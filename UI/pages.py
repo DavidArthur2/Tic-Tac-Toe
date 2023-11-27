@@ -648,6 +648,8 @@ def ninthpage():
     client.send_message('get online players')
     Wait_For_Request.wait()
 
+    print('passed')
+
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Players online: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Rank: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
