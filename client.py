@@ -91,6 +91,23 @@ def process_msg(msg):
 
         pages.leaderboard_list.append(page)
 
+    m = re.match(r'^online-players: (.*)', msg)
+    if m:
+        tmp = m.group(1).split(' ')
+        nb = len(tmp)
+        remain = nb % 10
+        page = []
+        for a in tmp:
+            b = a.split(',')
+            page.append((b[0], int(b[1])))
+            if len(page) % 10 == 0 and len(page) != 0:
+                pages.players_list.append(page)
+                page.clear()
+        for i in range(remain):
+            page.append(' ')
+
+        pages.players_list.append(page)
+
     m = re.match(r'player-rank: ([0-9]*)', msg)
     if m:
         pages.player_rank = int(m.group(1))
