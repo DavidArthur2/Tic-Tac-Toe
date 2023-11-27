@@ -2,3 +2,4 @@ PySimpleGUI
 opencv-python
 mediapipe
 pyautogui
+ping3
