@@ -44,20 +44,23 @@ def stop_connection():
 
 
 def process_msg(msg):
-    global May_Login, all_player_list
+    global May_Login
 
     if msg == 'auth suc':  # Successful authentication, can log in
         May_Login = 1
         send_message('get-rank')
         send_message('get-online-player-nb')
+        return
     elif msg == 'auth inc':  # Authentication not successful, incorrect pass/username taken on register
         May_Login = 2
+        return
 
     # If the player got an invitation
     m = re.match(r'game inv ([a-zA-Z0-9]+)', msg)
     if m:
         pages.enemy_name = m.group(1)
         pages.Got_Inv.set()
+        return
 
     # The signal of the starting of the game with the starting player
     m = re.match(r'^starting ([a-zA-Z0-9]+)', msg)
@@ -68,18 +71,21 @@ def process_msg(msg):
         else:
             base_game.starting_player = base_game.PLAYER_P2
         pages.Accepted.set()
+        return
 
     # During match, if the enemy moved
     m = re.match(r'^move ([0-9])', msg)
     if m:
         segm = int(m.group(1))
         base_game.request_put(segm, base_game.PLAYER_P2)
+        return
 
     m = re.match(r'^all-players: (.*)', msg)
     if m:
         tmp = m.group(1).split(' ')
         nb = len(tmp)
         remain = nb % 10
+        pages.leaderboard_list.clear()
         page = []
         for a in tmp:
             page.append(a)
@@ -90,12 +96,15 @@ def process_msg(msg):
             page.append(' ')
 
         pages.leaderboard_list.append(page)
+        pages.Wait_For_Request.set()
+        return
 
     m = re.match(r'^online-players: (.*)', msg)
     if m:
         tmp = m.group(1).split(' ')
         nb = len(tmp)
         remain = nb % 10
+        pages.players_list.clear()
         page = []
         for a in tmp:
             b = a.split(',')
@@ -107,14 +116,18 @@ def process_msg(msg):
             page.append(' ')
 
         pages.players_list.append(page)
+        pages.Wait_For_Request.set()
+        return
 
     m = re.match(r'player-rank: ([0-9]*)', msg)
     if m:
         pages.player_rank = int(m.group(1))
+        return
 
     m = re.match(r'online-player-nb: ([0-9]*)', msg)
     if m:
         pages.online_players = int(m.group(1))
+        return
 
 
 def listen_to_server():

@@ -32,6 +32,8 @@ Ended = threading.Event()
 Accepted = threading.Event()
 Got_Inv = threading.Event()
 
+Wait_For_Request = threading.Event()
+
 
 def firstpage():
     global window, position
@@ -467,6 +469,10 @@ def sixthpage():
 
 def seventhpage():
     global window
+    Wait_For_Request.clear()
+    client.send_message('get all players')
+    Wait_For_Request.wait()
+
     text1 = psg.Text(text='Leaderboard: ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='1.', font=('Algerian', 20), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Zoli74', font=('Algerian', 20), text_color='black', background_color=bgclr)
@@ -638,6 +644,10 @@ def eighthpage():
 
 def ninthpage():
     global window, enemy_name
+    Wait_For_Request.clear()
+    client.send_message('get online players')
+    Wait_For_Request.wait()
+
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Players online: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Rank: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
