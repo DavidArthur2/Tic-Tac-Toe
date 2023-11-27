@@ -21,6 +21,18 @@ prev_hover = 0
 hover = 0
 buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+leaderboard_list = [['Zoli74', 'Marci52', 'Jancsi', 'Arhur', 'Levi', 'Arnold', 'Janos', 'Jozsi', 'Robi', 'James'],
+                    ['Jane', 'Adri', 'Valaki', 'Megvalaki'],
+                    ['teszt1', 'teszt2']]
+list_page = 0
+leaderboard_rank = 1
+
+players_list = [[('Zoli74', 2), ('Marci52', 5), ('Jancsi', 1), ('Arhur', 7), ('Levi', 3), ('Arnold', 4), ('Janos', 6), ('Jozsi', 10)],
+                [('Jane', 12), ('Adri', 9), ('Valaki', 11), ('Megvalaki', 20)],
+                [('teszt1', 30), ('teszt2', 40)]]
+players_online_page = 0
+
+player = ''
 player_name = 'UN'
 player_rank = -1
 enemy_name = 'UN'
@@ -279,7 +291,7 @@ def fourthpage():
 
 
 def fifthpage():
-    global window
+    global window, player
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Ranking: ', font=('Algerian', 13), text_color='black', background_color=bgclr)
     text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 13), text_color='black', background_color=bgclr)
@@ -321,6 +333,14 @@ def fifthpage():
             ninthpage()
         elif event == 'Same PC':
             window.close()
+            player = 'Player2'
+            if camera_index is None:
+                tenthpage()
+            else:
+                sixthpage()
+        if Accepted.is_set():
+            start_match(GAME_PVP)
+            Accepted.clear()
             base_game.start_match(GAME_SAMEPC)
     window.close()
 
@@ -467,38 +487,70 @@ def sixthpage():
         sendError("Error in pages.py/sixthpage", str(e))
 
 
-def seventhpage():
-    global window
-    Wait_For_Request.clear()
-    client.send_message('get all players')
-    Wait_For_Request.wait()
-
+def update_leaderboard():
+    global window, leaderboard_list, list_page, leaderboard_rank
     text1 = psg.Text(text='Leaderboard: ', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text2 = psg.Text(text='1.', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text='Zoli74', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    text4 = psg.Text(text='2.', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    text5 = psg.Text(text='Marci52', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    b1 = psg.Button('Back', size=(10, 1))
-    space1 = psg.Text('', size=(30, 5), background_color=bgclr)
+    b1 = psg.Button('Back', size=(10, 1), key='-back-')
+    right_arrow = psg.Button('', image_filename='UI/right_arrow.png', key='-right-')
+    left_arrow = psg.Button('', image_filename='UI/left_arrow.png', key='-left-')
+    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
+    space2 = psg.Text('', size=(5, 1), background_color=bgclr)
+    space3 = psg.Text('', size=(5, 1), background_color=bgclr)
+    space4 = psg.Text('', size=(5, 1), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[text2]]
-    col3 = [[text4]]
+    col2 = [[psg.Text(text=user, font=('Algerian', 20), text_color='black', background_color=bgclr)]
+            for user in leaderboard_list[list_page]]
+    col3 = [[psg.Text(text=f'{rank}.', font=('Algerian', 20), text_color='black', background_color=bgclr)]
+            for rank in range(leaderboard_rank, len(leaderboard_list[list_page]) + leaderboard_rank)]
+    if len(leaderboard_list[list_page]) != 10:
+        col2 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]
+                 for i in range(1, 11-len(leaderboard_list[list_page]))]
+        col3 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]
+                 for i in range(1, 11-len(leaderboard_list[list_page]))]
+    col2 += [[space3], [right_arrow]]
+    col3 += [[space4], [left_arrow]]
     col4 = [[b1]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c')],
-              [psg.Column(col2, background_color=bgclr, justification='l'), text3],
-              [psg.Column(col3, background_color=bgclr, justification='l'), text5],
+              [psg.Column(col3, background_color=bgclr, justification='c'),
+               space2,
+               psg.Column(col2, background_color=bgclr, justification='c')],
               [space1],
               [psg.Column(col4, background_color=bgclr, justification='r')]
               ]
+    window.close()
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c')
+
+
+def seventhpage():
+    global window, leaderboard_list, list_page, leaderboard_rank
+    window = psg.Window('Tic-Tac-Toe')
+    Wait_For_Request.clear()
+    client.send_message('get all players')
+    Wait_For_Request.wait()
+    
+    update_leaderboard()
     while True:
         event, values = window.read()
         if event in (None, 'Exit'):
+            leaderboard_rank = 1
+            list_page = 0
             break
-        elif event == 'Back':
+        elif event == '-back-':
+            leaderboard_rank = 1
+            list_page = 0
             window.close()
             fourthpage()
+        elif event == '-right-':
+            if len(leaderboard_list) > list_page+1:
+                leaderboard_rank += len(leaderboard_list[list_page])
+                list_page += 1
+                update_leaderboard()
+        elif event == '-left-':
+            if 0 < list_page:
+                list_page -= 1
+                leaderboard_rank -= len(leaderboard_list[list_page])
+                update_leaderboard()
     window.close()
 
 
@@ -642,60 +694,134 @@ def eighthpage():
     window.close()
 
 
-def ninthpage():
-    global window, enemy_name
-    Wait_For_Request.clear()
-    client.send_message('get online players')
-    Wait_For_Request.wait()
-
-    print('passed')
-
+def update_players_online():
+    global window, players_online_page, players_list
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Players online: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Rank: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     b1 = psg.Button('Back', size=(10, 1))
-    space1 = psg.Text('', size=(30, 5), background_color=bgclr)
+    right_arrow = psg.Button('', image_filename='UI/right_arrow.png', key='-right-')
+    left_arrow = psg.Button('', image_filename='UI/left_arrow.png', key='-left-')
+    space1 = psg.Text('', size=(5, 1), background_color=bgclr)
     space2 = psg.Text('', size=(18, 1), background_color=bgclr)
     space3 = psg.Text('', size=(15, 1), background_color=bgclr)
-    space4 = psg.Text('', size=(15, 3), background_color=bgclr)
+    space4 = psg.Text('', size=(5, 1), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[psg.Button(size=(20, 2), button_text=f"Player {row}", key=f'P{row}')] for row in range(1, 4)]
-    col3 = [[psg.Text(text=f"{rank}", font=('Algerian', 25), text_color='black',
-                      background_color=bgclr)] for rank in range(1, 4)]
+    col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]
+            for player_online, key in
+            zip(players_list[players_online_page], range(1, len(players_list[players_online_page]) + 1))]
+    col3 = [[psg.Text(text=online_rank[1], font=('Algerian', 25), text_color='black', background_color=bgclr)]
+            for online_rank in players_list[players_online_page]]
+    if len(players_list[players_online_page]) != 8:
+        col2 += [[psg.Text('', font=('Algerian', 25), background_color=bgclr)]
+                 for _ in range(1, 9-len(players_list[players_online_page]))]
+        col3 += [[psg.Text('', font=('Algerian', 25), background_color=bgclr)]
+                 for _ in range(1, 9-len(players_list[players_online_page]))]
+    col2 += [[space1], [left_arrow]]
+    col3 += [[space4], [right_arrow]]
     col4 = [[text2]]
     col5 = [[b1]]
     col6 = [[text3]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c')],
-              [space4],
               [psg.Column(col4, background_color=bgclr, justification='l'), space3,
                psg.Column(col6, background_color=bgclr, justification='l')],
               [psg.Column(col2, background_color=bgclr, justification='l'), space2,
                psg.Column(col3, background_color=bgclr, justification='l')],
-              [space1],
               [psg.Column(col5, background_color=bgclr, justification='r')]
               ]
+    window.close()
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c')
+
+
+def ninthpage():
+    global window, players_online_page, players_list, player
+    window = psg.Window('Tic-Tac-Toe')
+    
+    Wait_For_Request.clear()
+    client.send_message('get online players')
+    Wait_For_Request.wait()
+    
+    update_players_online()
     while True:
         event, values = window.read()
         if event in (None, 'Exit'):
+            players_online_page = 0
             break
         elif event == 'Back':
+            players_online_page = 0
             window.close()
             fifthpage()
-        if event == 'P1':
+        elif event == 'P1':
+            players_online_page = 0
+            player = window['P1'].ButtonText
             window.close()
             Accepted.clear()
-            client.send_message('req game Zoli74')
+            client.send_message(f'req game {player}')
             enemy_name = 'Zoli74'
             eleventhpage()
-
+        elif event == 'P2':
+            players_online_page = 0
+            player = window['P2'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == 'P3':
+            players_online_page = 0
+            player = window['P3'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == 'P4':
+            players_online_page = 0
+            player = window['P4'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == 'P5':
+            players_online_page = 0
+            player = window['P5'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == 'P6':
+            players_online_page = 0
+            player = window['P6'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == 'P7':
+            players_online_page = 0
+            player = window['P7'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == 'P8':
+            players_online_page = 0
+            player = window['P8'].ButtonText
+            window.close()
+            Accepted.clear()
+            client.send_message(f'req game {player}')
+            eleventhpage()
+        elif event == '-right-':
+            if len(players_list) > players_online_page+1:
+                players_online_page += 1
+                update_players_online()
+        elif event == '-left-':
+            if 0 < players_online_page:
+                players_online_page -= 1
+                update_players_online()
     window.close()
 
 
 def tenthpage():
     global window
-
     text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -759,7 +885,7 @@ def tenthpage():
 
 
 def eleventhpage():
-    global window
+    global window, player
     text1 = psg.Text(text='Waiting', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='for', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -786,7 +912,7 @@ def eleventhpage():
             break
         elif event == 'Cancel':
             window.close()
-            fourthpage()
+            ninthpage()
         if Accepted.is_set():
             window.close()
             base_game.start_match(GAME_PVP)

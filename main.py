@@ -5,7 +5,7 @@ import time
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gesture Recognition'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
-from base_recognition import operate_recognition, camInitialized, stop_recognition
+import base_recognition as br
 import pages
 from base_game import start_match, GAME_PVE, GAME_SAMEPC, GAME_PVP
 import pyautogui
