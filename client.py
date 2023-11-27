@@ -90,12 +90,19 @@ def process_msg(msg):
         for a in tmp:
             page.append(a)
             if len(page) % 10 == 0 and len(page) != 0:
-                pages.leaderboard_list.append(page)
+                pages.leaderboard_list.append(page.copy())
                 page.clear()
         for i in range(remain):
             page.append(' ')
 
         pages.leaderboard_list.append(page)
+
+        pages.Wait_For_Request.set()
+        return
+
+    if msg == 'online-players:':
+        pages.players_list.clear()
+        pages.players_list.append((' ', 0))
         pages.Wait_For_Request.set()
         return
 
@@ -110,7 +117,7 @@ def process_msg(msg):
             b = a.split(',')
             page.append((b[0], int(b[1])))
             if len(page) % 10 == 0 and len(page) != 0:
-                pages.players_list.append(page)
+                pages.players_list.append(page.copy())
                 page.clear()
         for i in range(remain):
             page.append(' ')

@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gestu
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 import base_recognition as br
+from base_recognition import *
 import pages
 from base_game import start_match, GAME_PVE, GAME_SAMEPC, GAME_PVP
 import pyautogui

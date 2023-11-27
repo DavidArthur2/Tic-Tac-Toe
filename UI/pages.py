@@ -525,6 +525,7 @@ def update_leaderboard():
 def seventhpage():
     global window, leaderboard_list, list_page, leaderboard_rank
     window = psg.Window('Tic-Tac-Toe')
+
     Wait_For_Request.clear()
     client.send_message('get all players')
     Wait_For_Request.wait()
@@ -707,7 +708,7 @@ def update_players_online():
     space3 = psg.Text('', size=(15, 1), background_color=bgclr)
     space4 = psg.Text('', size=(5, 1), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]
+    col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]  #TODO, mikor elinditod az oldalt csunya errort ir ki ezekben a forokban
             for player_online, key in
             zip(players_list[players_online_page], range(1, len(players_list[players_online_page]) + 1))]
     col3 = [[psg.Text(text=online_rank[1], font=('Algerian', 25), text_color='black', background_color=bgclr)]
@@ -741,6 +742,8 @@ def ninthpage():
     Wait_For_Request.clear()
     client.send_message('get online players')
     Wait_For_Request.wait()
+
+    print
     
     update_players_online()
     while True:
@@ -748,68 +751,21 @@ def ninthpage():
         if event in (None, 'Exit'):
             players_online_page = 0
             break
-        elif event == 'Back':
-            players_online_page = 0
-            window.close()
-            fifthpage()
-        elif event == 'P1':
-            players_online_page = 0
-            player = window['P1'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            enemy_name = 'Zoli74'
-            eleventhpage()
-        elif event == 'P2':
-            players_online_page = 0
-            player = window['P2'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == 'P3':
-            players_online_page = 0
-            player = window['P3'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == 'P4':
-            players_online_page = 0
-            player = window['P4'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == 'P5':
-            players_online_page = 0
-            player = window['P5'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == 'P6':
-            players_online_page = 0
-            player = window['P6'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == 'P7':
-            players_online_page = 0
-            player = window['P7'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == 'P8':
-            players_online_page = 0
-            player = window['P8'].ButtonText
-            window.close()
-            Accepted.clear()
-            client.send_message(f'req game {player}')
-            eleventhpage()
-        elif event == '-right-':
+
+        for i in range(1, 9):
+            if event == f'P{i}':
+                players_online_page = 0
+                player = window[f'P{i}'].ButtonText
+                if player == ' ':
+                    psg.popup_ok('Hiba', 'Sajnos egyedül vagy fent!')
+                    break
+                window.close()
+                Accepted.clear()
+                client.send_message(f'req game {enemy_name}')
+                eleventhpage()
+                break
+
+        if event == '-right-':
             if len(players_list) > players_online_page+1:
                 players_online_page += 1
                 update_players_online()
