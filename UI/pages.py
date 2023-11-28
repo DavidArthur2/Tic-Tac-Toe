@@ -333,11 +333,7 @@ def fifthpage():
             ninthpage()
         elif event == 'Same PC':
             window.close()
-            player = 'Player2'
-            if camera_index is None:
-                tenthpage()
-            else:
-                sixthpage()
+            start_match(GAME_PVE)
         if Accepted.is_set():
             start_match(GAME_PVP)
             Accepted.clear()
@@ -708,7 +704,7 @@ def update_players_online():
     space3 = psg.Text('', size=(15, 1), background_color=bgclr)
     space4 = psg.Text('', size=(5, 1), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]  #TODO, mikor elinditod az oldalt csunya errort ir ki ezekben a forokban
+    col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]
             for player_online, key in
             zip(players_list[players_online_page], range(1, len(players_list[players_online_page]) + 1))]
     col3 = [[psg.Text(text=online_rank[1], font=('Algerian', 25), text_color='black', background_color=bgclr)]
@@ -743,8 +739,6 @@ def ninthpage():
     client.send_message('get online players')
     Wait_For_Request.wait()
 
-    print
-    
     update_players_online()
     while True:
         event, values = window.read()
