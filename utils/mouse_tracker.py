@@ -70,10 +70,12 @@ def get_hover_segment():
     try:
         Stop_Mouse_Detect.clear()
         while not Stop_Mouse_Detect.is_set():
-            if base_recognition.hand_segm != 0:
-                pages.hover = base_recognition.hand_segm
-            else:
-                pages.hover = get_mouse_segment()
+            if not pages.Stopped.is_set():
+                if base_recognition.hand_segm != 0:
+                    pages.hover = base_recognition.hand_segm
+                else:
+                    pages.hover = get_mouse_segment()
+
             time.sleep(0.01)
         print('Getting segment of the hovered area stopped!')
     except Exception as e:

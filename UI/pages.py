@@ -4,6 +4,8 @@ import threading
 import sys
 import os
 
+import main
+
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gesture Recognition'))
 import base_game
 import base_recognition
@@ -45,6 +47,7 @@ Accepted = threading.Event()
 Got_Inv = threading.Event()
 
 Wait_For_Request = threading.Event()
+Stopped = threading.Event()
 
 
 def firstpage():
@@ -457,6 +460,8 @@ def sixthpage():
                 pass
 
             if event == psg.WIN_CLOSED or event == "Exit":
+                window.close()
+                main.stop_program()
                 break
 
             elif not queue.empty():  # Puts the queued step on the GUI, which has a format of: pos letter
