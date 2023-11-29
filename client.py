@@ -108,7 +108,7 @@ def process_msg(msg):
 
     m = re.match(r'^online-players:(.*)', msg)
     if m:
-        tmp = m.group(1).split(' ')
+        tmp = m.group(1).strip().split(' ')
         nb = len(tmp)
         remain = nb % 10
         pages.players_list.clear()

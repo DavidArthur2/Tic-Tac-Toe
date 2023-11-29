@@ -341,6 +341,14 @@ def fifthpage():
                 tenthpage()
             else:
                 sixthpage()
+        if Got_Inv.is_set():
+            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            if r == "Yes":
+                Got_Inv.clear()
+                Accepted.set()
+            else:
+                Got_Inv.clear()
+
         if Accepted.is_set():
             start_match(GAME_PVP)
             Accepted.clear()
@@ -719,6 +727,7 @@ def update_players_online():
         col3 = [[psg.Text('', font=('Algerian', 25), background_color=bgclr)]
                  for _ in range(1, 9)]
     else:
+        players_list[players_online_page].remove(' ')
         col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]
                 for player_online, key in
                 zip(players_list[players_online_page], range(1, len(players_list[players_online_page]) + 1))]
@@ -747,7 +756,7 @@ def update_players_online():
 
 
 def ninthpage():
-    global window, players_online_page, players_list, player
+    global window, players_online_page, players_list, enemy_name
     window = psg.Window('Tic-Tac-Toe')
     
     Wait_For_Request.clear()
@@ -766,7 +775,7 @@ def ninthpage():
             fifthpage()
         for i in range(1, 9):
             if event == f'P{i}':
-                players_online_page = 0
+                enemy_name = players_list[players_online_page][i-1][0]
                 player = window[f'P{i}'].ButtonText
                 if player == ' ':
                     psg.popup_ok('Hiba', 'Sajnos egyedül vagy fent!')
@@ -775,6 +784,7 @@ def ninthpage():
                 Accepted.clear()
                 client.send_message(f'req game {enemy_name}')
                 eleventhpage()
+                players_online_page = 0
                 break
 
         if event == '-right-':

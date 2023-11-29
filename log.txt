@@ -1,3 +1,11 @@
 [2023-11-19 20:26:48] Warning in recognition_utils.py : In draw_frame function the segment cannot be calculated!  
 [2023-11-19 20:26:48] Warning in recognition_utils.py : In draw_frame function the segment cannot be calculated!  
 [2023-11-23 18:24:17] Error in pages.py/sixthpage : main thread is not in main loop
+[2023-11-27 20:33:17] An error occured in client.py/connect_to_server : timed out
+[2023-11-27 20:43:40] Server closed the connection : Most probably the server shut down!
+[2023-11-28 10:25:07] An error occured in client.py/connect_to_server : timed out
+[2023-11-28 10:25:47] Error in mouse_tracker/get_hover_segment : unsupported operand type(s) for -: 'int' and 'NoneType'
+[2023-11-28 10:28:28] Error in mouse_tracker/get_hover_segment : unsupported operand type(s) for -: 'int' and 'NoneType'
+[2023-11-28 10:33:15] Error in mouse_tracker/get_hover_segment : unsupported operand type(s) for -: 'int' and 'NoneType'
+[2023-11-29 20:26:25] Server closed the connection : Most probably the server shut down!
+[2023-11-29 20:32:44] Server closed the connection : Most probably the server shut down!
