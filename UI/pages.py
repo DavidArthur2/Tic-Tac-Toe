@@ -290,6 +290,17 @@ def fourthpage():
         elif event == 'PVE':
             window.close()
             base_game.start_match(GAME_PVE)
+        if Got_Inv.is_set():
+            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            if r == "Yes":
+                Got_Inv.clear()
+                client.send_message('accept game')
+            else:
+                Got_Inv.clear()
+
+        if Accepted.is_set():
+            Accepted.clear()
+            base_game.start_match(GAME_PVP)
     window.close()
 
 
@@ -338,8 +349,7 @@ def fifthpage():
             window.close()
             player = 'Player2'
             base_game.start_match(GAME_SAMEPC)
-        print(Got_Inv.is_set())
-        print(Accepted.is_set())
+
         if Got_Inv.is_set():
             r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
             if r == "Yes":
@@ -565,6 +575,17 @@ def seventhpage():
                 list_page -= 1
                 leaderboard_rank -= len(leaderboard_list[list_page])
                 update_leaderboard()
+        if Got_Inv.is_set():
+            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            if r == "Yes":
+                Got_Inv.clear()
+                client.send_message('accept game')
+            else:
+                Got_Inv.clear()
+
+        if Accepted.is_set():
+            Accepted.clear()
+            base_game.start_match(GAME_PVP)
     window.close()
 
 
@@ -624,6 +645,17 @@ def eighthpage():
     cap = None
     while True:
         event, values = window.read()
+        if Got_Inv.is_set():
+            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            if r == "Yes":
+                Got_Inv.clear()
+                client.send_message('accept game')
+            else:
+                Got_Inv.clear()
+
+        if Accepted.is_set():
+            Accepted.clear()
+            base_game.start_match(GAME_PVP)
         if event in (None, 'Exit'):
             break
         elif event == 'Back':
@@ -795,6 +827,17 @@ def ninthpage():
             if 0 < players_online_page:
                 players_online_page -= 1
                 update_players_online()
+        if Got_Inv.is_set():
+            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            if r == "Yes":
+                Got_Inv.clear()
+                client.send_message('accept game')
+            else:
+                Got_Inv.clear()
+
+        if Accepted.is_set():
+            Accepted.clear()
+            base_game.start_match(GAME_PVP)
     window.close()
 
 
@@ -859,6 +902,7 @@ def tenthpage():
                     put_on_window(i, letter)
                     x = not x
                     break
+
     window.close()
 
 
@@ -906,7 +950,7 @@ def twelfth():
         if decode_player(round_list[i]) == 'You':
             j += 1
     win = True if j > 1 else False
-    if win:
+    if not win:
         text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
                          background_color='green', border_width=50)
     else:
@@ -947,5 +991,15 @@ def twelfth():
         elif event == 'Rematch':
             window.close()
             fourthpage()
-            # eleventhpage() to be added
+        if Got_Inv.is_set():
+            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            if r == "Yes":
+                Got_Inv.clear()
+                client.send_message('accept game')
+            else:
+                Got_Inv.clear()
+
+        if Accepted.is_set():
+            Accepted.clear()
+            base_game.start_match(GAME_PVP)
     window.close()
