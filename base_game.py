@@ -314,6 +314,7 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
                     client.enemy_move = True
                 round_list[current_round] = current_player
                 threading.Timer(2, next_round).start()
+                roundend_event.set()
                 return 2
             return res
     except Exception as e:

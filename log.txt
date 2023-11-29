@@ -9,3 +9,5 @@
 [2023-11-28 10:33:15] Error in mouse_tracker/get_hover_segment : unsupported operand type(s) for -: 'int' and 'NoneType'
 [2023-11-29 20:26:25] Server closed the connection : Most probably the server shut down!
 [2023-11-29 20:32:44] Server closed the connection : Most probably the server shut down!
+[2023-11-29 20:53:02] Server closed the connection : Most probably the server shut down!
+[2023-11-29 21:11:49] Error in mouse_tracker/get_hover_segment : unsupported operand type(s) for -: 'int' and 'NoneType'
