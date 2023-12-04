@@ -45,6 +45,7 @@ Ended = threading.Event()
 
 Accepted = threading.Event()
 Got_Inv = threading.Event()
+Refused = threading.Event()
 
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
@@ -271,7 +272,7 @@ def fourthpage():
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c')
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
         elif event == 'Logout':
@@ -296,6 +297,7 @@ def fourthpage():
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
+                client.send_message('refuse game')
                 Got_Inv.clear()
 
         if Accepted.is_set():
@@ -555,7 +557,7 @@ def seventhpage():
     
     update_leaderboard()
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             leaderboard_rank = 1
             list_page = 0
@@ -644,7 +646,7 @@ def eighthpage():
                         element_justification='c')
     cap = None
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if Got_Inv.is_set():
             r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
             if r == "Yes":
@@ -797,7 +799,7 @@ def ninthpage():
 
     update_players_online()
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             players_online_page = 0
             break
@@ -935,6 +937,11 @@ def eleventhpage():
         elif event == 'Cancel':
             window.close()
             ninthpage()
+        if Refused.is_set():
+            Refused.clear()
+            psg.popup_ok('Refused', f'{enemy_name} refused your invitation!')
+            window.close()
+            fourthpage()
         if Accepted.is_set():
             window.close()
             base_game.start_match(GAME_PVP)
@@ -982,7 +989,7 @@ def twelfth():
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c', finalize=True)
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
         elif event == 'Go to menu':

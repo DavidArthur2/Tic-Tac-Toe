@@ -119,7 +119,7 @@ def process_msg(msg):
             if len(page) % 10 == 0 and len(page) != 0:
                 pages.players_list.append(page.copy())
                 page.clear()
-        for i in range(remain):
+        for i in range(10-remain):
             page.append(' ')
 
         pages.players_list.append(page)
@@ -135,6 +135,8 @@ def process_msg(msg):
     if m:
         pages.online_players = int(m.group(1))
         return
+    if msg == 'enemy refused':
+        pages.Refused.set()
 
 
 def listen_to_server():
