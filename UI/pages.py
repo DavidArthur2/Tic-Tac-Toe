@@ -46,6 +46,7 @@ Ended = threading.Event()
 Accepted = threading.Event()
 Got_Inv = threading.Event()
 Refused = threading.Event()
+Logout = threading.Event()
 
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
@@ -128,7 +129,7 @@ def secondpage():
     show_password = False
 
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             break
         elif event == 'Show Password':
@@ -152,6 +153,9 @@ def secondpage():
                 fourthpage()
             elif client.May_Login == 2:
                 psg.popup_ok("Incorrect credentials!", font=16, text_color='red')
+                continue
+            elif client.May_Login == 3:
+                psg.popup_ok("User already logged in!", font=16, text_color='red')
                 continue
 
     window.close()
@@ -250,7 +254,6 @@ def fourthpage():
     space3 = psg.Text('', size=(30, 5), background_color=bgclr)
     space4 = psg.Text('', size=(10, 1), background_color=bgclr)
     space5 = psg.Text('', size=(10, 4), background_color=bgclr)
-    popup = psg.Button('PopUp')
     col1 = [[text1]]
     col2 = [[text2]]
     col3 = [[text4]]
@@ -265,7 +268,6 @@ def fourthpage():
               [psg.Column(col4, background_color=bgclr, justification='c')],
               [space3],
               [psg.Column(col5, background_color=bgclr, justification='c'), leaderboard, tutorial],
-              [popup],
               [space5],
               [psg.Column(col6, background_color=bgclr, justification='r')]
               ]
@@ -277,6 +279,7 @@ def fourthpage():
             break
         elif event == 'Logout':
             client.May_Login = 0
+            client.stop_connection()
             window.close()
             firstpage()
         elif event == 'PVP':
@@ -291,6 +294,11 @@ def fourthpage():
         elif event == 'PVE':
             window.close()
             base_game.start_match(GAME_PVE)
+
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
         if Got_Inv.is_set():
             r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
             if r == "Yes":
@@ -360,6 +368,11 @@ def fifthpage():
             else:
                 Got_Inv.clear()
 
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
+
         if Accepted.is_set():
             Accepted.clear()
             base_game.start_match(GAME_PVP)
@@ -407,7 +420,7 @@ def sixthpage():
         b7 = psg.Button('', key='-7-', button_color='white', image_filename='UI/background.png')
         b8 = psg.Button('', key='-8-', button_color='white', image_filename='UI/background.png')
         b9 = psg.Button('', key='-9-', button_color='white', image_filename='UI/background.png')
-        if base_game.current_round != 0:
+        if base_game.current_round != 1:
             for i in range(len(round_list)):
                 t = 'UI/roundBlank.png'
                 kei = f'{i}.round'
@@ -487,6 +500,10 @@ def sixthpage():
                 window.close()
                 main.stop_program()
                 break
+            if Logout.is_set():
+                Logout.clear()
+                window.close()
+                firstpage()
 
             elif not queue.empty():  # Puts the queued step on the GUI, which has a format of: pos letter
                 raw = queue.get()
@@ -584,6 +601,10 @@ def seventhpage():
                 client.send_message('accept game')
             else:
                 Got_Inv.clear()
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
 
         if Accepted.is_set():
             Accepted.clear()
@@ -654,6 +675,11 @@ def eighthpage():
                 client.send_message('accept game')
             else:
                 Got_Inv.clear()
+
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
 
         if Accepted.is_set():
             Accepted.clear()
@@ -836,6 +862,10 @@ def ninthpage():
                 client.send_message('accept game')
             else:
                 Got_Inv.clear()
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
 
         if Accepted.is_set():
             Accepted.clear()
@@ -942,6 +972,11 @@ def eleventhpage():
             psg.popup_ok('Refused', f'{enemy_name} refused your invitation!')
             window.close()
             fourthpage()
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
+
         if Accepted.is_set():
             window.close()
             base_game.start_match(GAME_PVP)
@@ -954,7 +989,7 @@ def twelfth():
     global win, window
     j = 0
     for i in round_list:
-        if decode_player(round_list[i]) == 'You':
+        if base_game.decode_player(i) == 'You':
             j += 1
     win = True if j > 1 else False
     if not win:
@@ -998,6 +1033,10 @@ def twelfth():
         elif event == 'Rematch':
             window.close()
             fourthpage()
+        if Logout.is_set():
+            Logout.clear()
+            window.close()
+            firstpage()
         if Got_Inv.is_set():
             r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
             if r == "Yes":

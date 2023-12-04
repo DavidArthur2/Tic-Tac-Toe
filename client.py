@@ -5,6 +5,9 @@ import re
 import ping3
 import sys
 import os
+
+import main
+
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 import pages
@@ -54,6 +57,9 @@ def process_msg(msg):
     elif msg == 'auth inc':  # Authentication not successful, incorrect pass/username taken on register
         May_Login = 2
         return
+    elif msg == 'auth ali':
+        May_Login = 3
+        return
 
     # If the player got an invitation
     m = re.match(r'game inv ([a-zA-Z0-9]+)', msg)
@@ -82,7 +88,7 @@ def process_msg(msg):
 
     m = re.match(r'^all-players:(.*)', msg)
     if m:
-        tmp = m.group(1).split(' ')
+        tmp = m.group(1).strip().split(' ')
         nb = len(tmp)
         remain = nb % 10
         pages.leaderboard_list.clear()
@@ -92,7 +98,7 @@ def process_msg(msg):
             if len(page) % 10 == 0 and len(page) != 0:
                 pages.leaderboard_list.append(page.copy())
                 page.clear()
-        for i in range(remain):
+        for i in range(10-remain):
             page.append(' ')
 
         pages.leaderboard_list.append(page)
@@ -119,7 +125,7 @@ def process_msg(msg):
             if len(page) % 10 == 0 and len(page) != 0:
                 pages.players_list.append(page.copy())
                 page.clear()
-        for i in range(10-remain):
+        for i in range(remain):
             page.append(' ')
 
         pages.players_list.append(page)
@@ -158,6 +164,7 @@ def listen_to_server():
             break
     server_socket.close()
     print('You have been disconnected from the server!')
+    pages.Logout.set()
 
 
 def auth(username, password, reg=False):

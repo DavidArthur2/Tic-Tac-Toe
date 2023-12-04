@@ -53,8 +53,8 @@ board = [  # 0 ha üres,1 ha X, 2 ha O
 
 def clear_board(r=False):
     try:
-        global board_counter, current_round
-        for i in range(0, 3):
+        global board_counter, current_round, round_list
+        for i in range(0, 4):
             if r:
                 round_list[i] = -1
             for j in range(0, 3):
@@ -62,6 +62,7 @@ def clear_board(r=False):
         board_counter = 0
         if r:
             current_round = 0
+        print(round_list)
         while not queue.empty():
             queue.get()
     except Exception as e:

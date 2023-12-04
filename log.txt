@@ -11,3 +11,7 @@
 [2023-11-29 20:32:44] Server closed the connection : Most probably the server shut down!
 [2023-11-29 20:53:02] Server closed the connection : Most probably the server shut down!
 [2023-11-29 21:11:49] Error in mouse_tracker/get_hover_segment : unsupported operand type(s) for -: 'int' and 'NoneType'
+[2023-12-04 13:32:48] Server closed the connection : Most probably the server shut down!
+[2023-12-04 13:43:11] Warning in pages.py/sixthpage : Queue not empty on initializing page!
+9 X
+[2023-12-04 13:49:00] Warning in recognition_utils.py : In draw_frame function the segment cannot be calculated!  
