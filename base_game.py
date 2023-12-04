@@ -51,18 +51,19 @@ board = [  # 0 ha üres,1 ha X, 2 ha O
     [0, 0, 0]]
 
 
-def clear_board(r=False):
+def clear_board(r=False, b=False):
     try:
         global board_counter, current_round, round_list
-        for i in range(0, 4):
-            if r:
+        for i in range(0, 3):
+            if r and not b:
                 round_list[i] = -1
             for j in range(0, 3):
                 board[i][j] = EMPTY
         board_counter = 0
         if r:
             current_round = 0
-        print(round_list)
+            if not b:
+                round_list[3] = -1
         while not queue.empty():
             queue.get()
     except Exception as e:
@@ -181,7 +182,7 @@ def exit_game_delayed():
     try:
         global match_ended
         match_ended = True
-        clear_board(True)
+        clear_board(True, True)
     except Exception as e:
         sendError("Error in base_game.py/exit_game_delayed", str(e))
 

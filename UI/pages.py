@@ -153,9 +153,11 @@ def secondpage():
                 fourthpage()
             elif client.May_Login == 2:
                 psg.popup_ok("Incorrect credentials!", font=16, text_color='red')
+                client.May_Login = 0
                 continue
             elif client.May_Login == 3:
                 psg.popup_ok("User already logged in!", font=16, text_color='red')
+                client.May_Login = 0
                 continue
 
     window.close()
@@ -404,6 +406,7 @@ def sixthpage():
         answ = ''
         while not queue.empty():
             answ += str(queue.get())
+            queue.get()
         sendError('Warning in pages.py/sixthpage', 'Queue not empty on initializing page!\n'+answ, 0)
     try:
         roundd = [None, None, None, None]
@@ -992,12 +995,13 @@ def twelfth():
         if base_game.decode_player(i) == 'You':
             j += 1
     win = True if j > 1 else False
-    if not win:
+    if win:
         text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
                          background_color='green', border_width=50)
     else:
         text1 = psg.Text(text='Defeat', font=('Algerian', 50), text_color='black',
                          background_color='red', border_width=50)
+    base_game.clear_board(True)
     text2 = psg.Text(text='New Rank:', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 30), text_color='black', background_color=bgclr)
     space1 = psg.Text('', size=(30, 4), background_color=bgclr)
