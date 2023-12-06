@@ -75,8 +75,9 @@ def decode_player(player):
         return 'PC'
     elif player == PLAYER_P2:
         return pages.enemy_name
-    else:
+    elif player == PLAYER_ME:
         return 'You'
+    return None
 
 
 def decode_pos(pos):  # Input: 1-9 numbers, Output: row, col; If invalid input, exception raised

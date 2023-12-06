@@ -13,15 +13,36 @@ stop_cam = False
 cam = None
 raw_frame = None
 camInitialized = threading.Event()
+camInitFinished = threading.Event()
 hand_segm = 0
+cam_id = 0
+cam_list = []
 
 detection_confidence = 0.7
 tracking_confidence = 0.5
 
 
+def list_cameras():
+    index = 0
+    cam_list.clear()
+    while True:
+        cap = cv2.VideoCapture(index)
+        if not cap.read()[0]:
+            break
+        cam_list.append((index, cap.getBackendName()))
+        cap.release()
+        index += 1
+
+
 def initialize_camera():
     global cam
-    cam = cv2.VideoCapture(0)
+    list_cameras()
+
+    if not len(cam_list):
+        sendError('Nincs kamera', 'Nincs észlelve kamera!')
+        return False
+
+    cam = cv2.VideoCapture(cam_id)
 
     if cam is None:
         sendError("Hiba a kameránál", "Nincs inicializálva a kamera!")
@@ -98,12 +119,16 @@ def stop_recognition():
 
 
 def operate_recognition():
-    global hands_detector, camInitialized
+    global hands_detector, camInitialized, stop_cam
 
+    stop_cam = False
     # Initialize recognizer
     camInitialized.clear()
+    camInitFinished.clear()
     if not initialize_camera():
+        camInitFinished.set()
         return
+    camInitFinished.set()
     camInitialized.set()
 
     # Start capturing and recognizing

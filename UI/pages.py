@@ -654,7 +654,7 @@ def eighthpage():
     text3 = psg.Text(text='Select preferred camera: ', font=('Algerian', 15), text_color='black',
                      background_color=bgclr)
     im = psg.Image(filename="", key="image")
-    comb = psg.Combo(values=camera_list, key="camera_index")
+    comb = psg.Combo(values=base_recognition.cam_list, key="camera_index", readonly=True)
     b1 = psg.Button('Back', size=(10, 1))
     b2 = psg.Button('', size=(3, 1), key='lightblue', button_color='light blue')
     b3 = psg.Button('', size=(3, 1), key='lightgreen', button_color='light green')
@@ -682,7 +682,6 @@ def eighthpage():
               ]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c')
-    cap = None
     while True:
         event, values = window.read(timeout=100)
         if Got_Inv.is_set():
@@ -728,60 +727,24 @@ def eighthpage():
         elif event == "Select":
             selected_camera = values["camera_index"]
             global camera_index
-            camera_index = selected_camera[1]
-            if cap is None:
-                cap = cv2.VideoCapture(camera_index)
-            while True:
-                ret, frame = cap.read()
-                if not ret:
-                    psg.popup_error("Camera not available.")
-                    cap.release()
-                    cap = None
-                    break
-                frame = cv2.resize(frame, (194, 144))
-                imgbytes = cv2.imencode(".png", frame)[1].tobytes()
+            camera_index = selected_camera[0]
+            base_recognition.stop_recognition()
+            if main.cam_t is not None:
+                main.cam_t.join()
+            base_recognition.cam_id = camera_index
+            main.cam_t = threading.Thread(target=base_recognition.operate_recognition)
+            main.cam_t.start()
 
-                window["image"].update(data=imgbytes)
-
-                event, values = window.read(timeout=20)
-                if event == psg.WIN_CLOSED or event == "Exit":
-                    cap.release()
-                    cap = None
-                    break
-                elif event == 'Back':
-                    cap.release()
-                    cap = None
-                    window.close()
-                    fourthpage()
-                    break
-                elif event == 'lightblue':
-                    bgclr = 'light blue'
-                    cap.release()
-                    cap = None
-                    window.close()
-                    eighthpage()
-                    break
-                elif event == 'lightgreen':
-                    bgclr = 'light green'
-                    cap.release()
-                    cap = None
-                    window.close()
-                    eighthpage()
-                    break
-                elif event == 'red':
-                    bgclr = 'red'
-                    cap.release()
-                    cap = None
-                    window.close()
-                    eighthpage()
-                    break
-                elif event == 'lightyellow':
-                    bgclr = 'light yellow'
-                    window.close()
-                    cap.release()
-                    cap = None
-                    eighthpage()
-                    break
+            base_recognition.camInitFinished.wait()
+            if not base_recognition.camInitialized.is_set():
+                psg.popup_error("Camera not available.")
+                base_recognition.stop_recognition()
+                return
+        if base_recognition.cam is None or base_recognition.raw_frame is None:
+            break
+        frame = cv2.resize(base_recognition.raw_frame, (194, 144))
+        imgbytes = cv2.imencode(".png", frame)[1].tobytes()
+        window["image"].update(data=imgbytes)
     window.close()
 
 
@@ -1038,7 +1001,7 @@ def twelfth():
     col2 = [[text2]]
     col3 = [[text3]]
     col4 = [[new_game]]
-    if base_game.game_type == PVP:
+    if base_game.game_type == GAME_PVP:
         col5 = [[rematch]]
     else:
         col5 = [[space5]]

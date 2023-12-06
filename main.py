@@ -1,3 +1,4 @@
+
 import threading
 import sys
 import os
@@ -12,6 +13,7 @@ from base_game import start_match, GAME_PVE, GAME_SAMEPC, GAME_PVP
 import pyautogui
 import mouse_tracker
 import client
+
 
 cam_t = None
 mouse_t = None
@@ -64,6 +66,7 @@ if __name__ == '__main__':
     UI_t = threading.Thread(target=pages.firstpage)
     UI_t.start()
     print('UI started!\n')
+
 
 
 # Innen meghivando jatek elejen: client.connect_to_server - kulon thread
