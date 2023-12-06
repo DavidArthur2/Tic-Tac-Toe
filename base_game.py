@@ -237,6 +237,8 @@ def next_round(tie=False):
             else:
                 tmp = PLAYER_ME
             print(f'The winner of the match is {decode_player(tmp)}! Rounds won: {[decode_player(round_list[value]) for value in range(1, len(round_list)) if value != 0]}\n')
+            if decode_player(tmp) == 'You':
+                client.send_message('won')
             threading.Timer(4, exit_game_delayed).start()
             return
 

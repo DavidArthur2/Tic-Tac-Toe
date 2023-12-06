@@ -42,8 +42,8 @@ def check_internet_connection():
 def stop_connection():
     if Connected_To_Server.is_set():
         listen_stop_flag.set()
-    else:
-        print('You have been disconnected from the server!')
+    print('You have been disconnected from the server!')
+    Connected_To_Server.clear()
 
 
 def process_msg(msg):
@@ -61,6 +61,9 @@ def process_msg(msg):
         May_Login = 3
         return
 
+    if msg == 'Enemy ingame':
+        pages.Ingame.set()
+        return
     # If the player got an invitation
     m = re.match(r'game inv ([a-zA-Z0-9]+)', msg)
     if m:

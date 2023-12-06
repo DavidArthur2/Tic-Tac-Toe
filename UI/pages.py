@@ -47,6 +47,7 @@ Accepted = threading.Event()
 Got_Inv = threading.Event()
 Refused = threading.Event()
 Logout = threading.Event()
+Ingame = threading.Event()
 
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
@@ -54,6 +55,7 @@ Stopped = threading.Event()
 
 def firstpage():
     global window, position
+    Logout.clear()
     b1 = psg.Button("Login", size=(30, 2))
     b2 = psg.Button("Register", size=(30, 2))
     b3 = psg.Button("Play as Guest", size=(30, 2))
@@ -68,8 +70,9 @@ def firstpage():
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     space2 = psg.Text('', size=(30, 1), background_color=bgclr)
     space3 = psg.Text('', size=(30, 8), background_color=bgclr)
+    space4 = psg.Text('', size=(30, 8), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[b1], [space1], [b2], [space2], [b3]]
+    col2 = [[b1], [space1], [b2], [space2], [space4]]
     col3 = [[text2]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='center')],
               [space],
@@ -84,9 +87,15 @@ def firstpage():
         if event in (None, 'Exit'):
             break
         elif event == 'Login':
+            if not client.Connected_To_Server.is_set():
+                client.connect_to_server()
+                client.Connected_To_Server.wait()
             window.close()
             secondpage()
         elif event == 'Register':
+            if not client.Connected_To_Server.is_set():
+                client.connect_to_server()
+                client.Connected_To_Server.wait()
             window.close()
             thirdpage()
         elif event == 'Play as Guest':
@@ -236,13 +245,18 @@ def thirdpage():
 
 
 def fourthpage():
-    global window
+    global window, player_rank
+    Logout.clear()
     text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 50), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Ranking: ', font=('Algerian', 13), text_color='black', background_color=bgclr)
+
+    client.send_message('get-rank')
     timeout = 0
+    player_rank = -1
     while player_rank == -1 and timeout < 100:
         time.sleep(0.1)
         timeout += 1
+
     text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 13), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='Mode: ', font=('Algerian', 25), text_color='black', background_color=bgclr)
     pve = psg.Button('PVE', size=(25, 2))
@@ -979,6 +993,11 @@ def eleventhpage():
             Logout.clear()
             window.close()
             firstpage()
+        if Ingame.is_set():
+            Ingame.clear()
+            psg.popup_ok('Declined', f'{enemy_name} is already in game!')
+            window.close()
+            fourthpage()
 
         if Accepted.is_set():
             window.close()
@@ -990,6 +1009,10 @@ def eleventhpage():
 
 def twelfth():
     global win, window
+    timeout = 0
+    while player_rank == -1 and timeout < 100:
+        time.sleep(0.1)
+        timeout += 1
     j = 0
     for i in round_list:
         if base_game.decode_player(i) == 'You':
@@ -1008,13 +1031,17 @@ def twelfth():
     space2 = psg.Text('', size=(30, 1), background_color=bgclr)
     space3 = psg.Text('', size=(30, 4), background_color=bgclr)
     space4 = psg.Text('', size=(30, 1), background_color=bgclr)
+    space5 = psg.Text('', size=(30, 4), background_color=bgclr)
     new_game = psg.Button('Go to menu', size=(25, 3))
     rematch = psg.Button('Rematch', size=(25, 3))
     col1 = [[text1]]
     col2 = [[text2]]
     col3 = [[text3]]
     col4 = [[new_game]]
-    col5 = [[rematch]]
+    if base_game.game_type == PVP:
+        col5 = [[rematch]]
+    else:
+        col5 = [[space5]]
     layout = [[space4],
               [psg.Column(col1, background_color=bgclr, justification='c')],
               [space1],
@@ -1036,7 +1063,9 @@ def twelfth():
             fourthpage()
         elif event == 'Rematch':
             window.close()
-            fourthpage()
+            Accepted.clear()
+            client.send_message(f'req game {enemy_name}')
+            eleventhpage()
         if Logout.is_set():
             Logout.clear()
             window.close()
