@@ -16,7 +16,7 @@ from utils.error import sendError
 
 
 server_socket: socket.socket = None
-May_Login = 0  # 0 - waiting, 1 succesful, 2 unsucc/username taken
+May_Login = 0  # 0 - waiting, 1 succesful, 2 unsucc/username taken, 3 already logged in
 listen_stop_flag = threading.Event()
 Connected_To_Server = threading.Event()
 
@@ -31,7 +31,7 @@ def check_internet_connection():
     while True:
         time.sleep(2)
         try:
-            result = ping3.ping("google.com", timeout=2)
+            result = ping3.ping(SERVER_IP, timeout=2)
             if not result:
                 print('There was a problem with the internet connection. Please check!')
                 exit(-1)  # TODO: How to shutdown all threads
