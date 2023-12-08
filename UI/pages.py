@@ -3,6 +3,7 @@ import cv2
 import threading
 import sys
 import os
+import hashlib
 
 import main
 
@@ -48,6 +49,7 @@ Got_Inv = threading.Event()
 Refused = threading.Event()
 Logout = threading.Event()
 Ingame = threading.Event()
+CantPut = threading.Event()
 
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
@@ -152,7 +154,8 @@ def secondpage():
                 psg.popup_ok('Server unreachable!', 'You are not connected to the server!\nCheck your internet connection, and restart the game!')
                 continue
 
-            client.auth(values['username'], values['pass'])
+            password = hashlib.md5(values['pass'].encode()).hexdigest()
+            client.auth(values['username'], password)
             while not client.May_Login:
                 continue
             if client.May_Login == 1:
@@ -230,7 +233,8 @@ def thirdpage():
                 psg.popup_ok("Passwords are not matching!", font=16)
                 continue
             else:
-                client.auth(values['username'], values['psw'], reg=True)
+                password = hashlib.md5(values['psw'].encode()).hexdigest()
+                client.auth(values['username'], password, reg=True)
                 while not client.May_Login:  # Wait for response from the server
                     continue
                 if client.May_Login == 1:
@@ -416,6 +420,7 @@ def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
 
 def sixthpage():
     global window, position, hover, prev_hover
+    CantPut.clear()
     if not queue.empty():
         answ = ''
         while not queue.empty():
@@ -528,7 +533,7 @@ def sixthpage():
                 pos = int(raw[0])
                 letter = raw[1]
                 put_on_window(pos, letter)
-            else:  # If nothing happened, then we check if the player moved on the screen
+            elif not CantPut.is_set():  # If nothing happened, then we check if the player moved on the screen
                 for i in range(1, 10):
                     tmp = f'-{i}-'
                     if event == tmp:
@@ -725,6 +730,7 @@ def eighthpage():
             window.close()
             fourthpage()
         elif event == "Select":
+            psg.popup_timed('Please wait while the camera is changing.', auto_close_duration=2)
             selected_camera = values["camera_index"]
             global camera_index
             camera_index = selected_camera[0]
@@ -978,15 +984,23 @@ def twelfth():
         timeout += 1
     j = 0
     for i in round_list:
-        if base_game.decode_player(i) == 'You':
+        if base_game.decode_player(i) == 'You' and (base_game.game_type == GAME_PVP or base_game.game_type == GAME_PVE) or base_game.decode_player(i) == 'Player_1' and base_game.game_type == GAME_SAMEPC:
             j += 1
     win = True if j > 1 else False
-    if win:
-        text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
-                         background_color='green', border_width=50)
+    if base_game.game_type != GAME_SAMEPC:
+        if win:
+            text1 = psg.Text(text='Victory', font=('Algerian', 50), text_color='black',
+                             background_color='green', border_width=50)
+        else:
+            text1 = psg.Text(text='Defeat', font=('Algerian', 50), text_color='black',
+                             background_color='red', border_width=50)
     else:
-        text1 = psg.Text(text='Defeat', font=('Algerian', 50), text_color='black',
-                         background_color='red', border_width=50)
+        if win:
+            text1 = psg.Text(text='Victory for Player_1', font=('Algerian', 30), text_color='black',
+                             background_color='green', border_width=50)
+        else:
+            text1 = psg.Text(text='Victory for Player_2', font=('Algerian', 30), text_color='black',
+                             background_color='green', border_width=50)
     base_game.clear_board(True)
     text2 = psg.Text(text='New Rank:', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text=f'{player_rank}', font=('Algerian', 30), text_color='black', background_color=bgclr)

@@ -73,8 +73,12 @@ def clear_board(r=False, b=False):
 def decode_player(player):
     if player == PLAYER_PC:
         return 'PC'
-    elif player == PLAYER_P2:
+    elif player == PLAYER_P2 and game_type == GAME_PVP:
         return pages.enemy_name
+    elif player == PLAYER_P2 and game_type == GAME_SAMEPC:
+        return 'Player_2'
+    elif player == PLAYER_ME and game_type == GAME_SAMEPC:
+        return 'Player_1'
     elif player == PLAYER_ME:
         return 'You'
     return None
@@ -347,11 +351,13 @@ def put(pos, letter):  # Returns: -1, if not empty; 0, if no space; 1, if succes
 
         res, _ = check_win()
         if res == TIE:  # If the game is TIE
+            pages.CantPut.set()
             print('The game finished TIE\n')
             print_board()
             return 2
 
         if res != NOT_ENDED:  # When we have a winner
+            pages.CantPut.set()
             print(f'The winner is: {decode_player(current_player)} with letter {decode_letter(letter)}\n')
             print_board()
             return 2
@@ -407,6 +413,7 @@ def start_match(gt):  # Game types: GAME_PVP,GAME_PVE,GAME_SAMEPC; 3 round games
             current_player = starting_player
 
             print(f'The game has started! Starting player is: {decode_player(current_player)}\n')
+            pages.enemy_name = 'Player_2'
 
             pages.Ended.clear()
             pages.sixthpage()  # Calls GUI

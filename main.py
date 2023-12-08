@@ -22,24 +22,35 @@ UI_t = None
 
 
 def stop_program():
-    stop_recognition()
     client.stop_connection()
+    stop_recognition()
     mouse_tracker.stop_hover_segment()
 
+    if server_t is not None:
+        server_t.join()
     if cam_t is not None:
         cam_t.join()
     if mouse_t is not None:
         mouse_t.join()
-    if server_t is not None:
-        server_t.join()
     if UI_t is not None:
         UI_t.join()
 
     print('The program shut down!')
-    sys.exit()  # TODO: Megkerdezni a tanart miert nem all meg
 
 
 if __name__ == '__main__':
+    print('Connecting to the server...')
+    server_t = threading.Thread(target=client.connect_to_server)
+    server_t.start()
+
+    client.Connected_To_Server.wait(timeout=2)
+    if not client.Connected_To_Server.is_set():
+        print('Connection to the server failed...\nCheck server up-state, and your internet connection!')
+        stop_program()
+        exit(1)
+
+    print('Successfully connected to the server!\n')
+
     print('Initializing cam...')
     cam_t = threading.Thread(target=operate_recognition)
     cam_t.start()
@@ -52,20 +63,13 @@ if __name__ == '__main__':
     mouse_t.start()
     print('Mouse position detector started!\n')
 
-    print('Connecting to the server...')
-    server_t = threading.Thread(target=client.connect_to_server)
-    server_t.start()
-    server_t.join()
-    if client.Connected_To_Server.is_set():
-        print('Successfuly connected to the server!\n')
-    else:
-        print('Connection to the server failed...\nCheck server up-state, and your internet connection!')
-        stop_program()
-
     print('Starting UI...')
     UI_t = threading.Thread(target=pages.firstpage)
     UI_t.start()
     print('UI started!\n')
+
+
+
 
 
 

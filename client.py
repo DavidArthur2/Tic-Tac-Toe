@@ -28,15 +28,19 @@ enemy_move = False
 
 
 def check_internet_connection():
-    while True:
+    while not listen_stop_flag.is_set():
         time.sleep(2)
         try:
-            result = ping3.ping(SERVER_IP, timeout=2)
-            if not result:
+            ip_address = socket.gethostbyname(SERVER_IP)
+            result = ping3.ping(ip_address, timeout=5)
+            if result is None:
                 print('There was a problem with the internet connection. Please check!')
-                exit(-1)  # TODO: How to shutdown all threads
+                # exit(-1)
+                print('check_internet_connection ended')
+                return
         except Exception as e:
             sendError('Error in client.py/check_internet_connection', str(e))
+    return
 
 
 def stop_connection():
@@ -190,14 +194,14 @@ def send_message(msg):
 def connect_to_server():
     global server_socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(1)
+    server_socket.settimeout(2)
 
     listen_stop_flag.clear()
-    threading.Thread(target=check_internet_connection).start()
 
     try:
         server_socket.connect((SERVER_IP, SERVER_PORT))
         print(f"Connection to the server({SERVER_IP}:{SERVER_PORT}) was successful!")
+        threading.Thread(target=check_internet_connection).start()
         Connected_To_Server.set()
         send_message('get-online-player-nb')
     except ConnectionRefusedError as e:
