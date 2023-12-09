@@ -9,8 +9,7 @@ def recognize_gesture(hand_landmarks, frame):
 
     pos_x, pos_y = calc_median_pos(hand_landmarks, frame)
     segm = calc_hand_segment(pos_x, pos_y)
-    draw_frame(frame, pos_x, pos_y, hand_landmarks=hand_landmarks, show_hand=True, show_grid=True, show_segment=True,
-               show_pos=True)
+    draw_frame(frame, pos_x, pos_y, hand_landmarks=hand_landmarks, show_grid=True, show_dot=True, show_segment=True)
 
     landmarks = hand_landmarks.landmark
 

@@ -180,8 +180,10 @@ def auth(username, password, reg=False):
             server_socket.send(f'auth-reg: {username} {password}'.encode())
         else:
             server_socket.send(f'auth: {username} {password}'.encode())
+        return True
     except Exception as e:
         sendError('Error in authentication', str(e))
+        return False
 
 
 def send_message(msg):

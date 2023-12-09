@@ -17,7 +17,8 @@ camInitFinished = threading.Event()
 hand_segm = 0
 cam_id = 0
 cam_list = []
-
+curr_gesture = 0
+show_grid = False
 detection_confidence = 0.7
 tracking_confidence = 0.5
 
@@ -71,23 +72,25 @@ def capture_frame():
 
 
 def process_frame(frame):
-    global stop_cam, raw_frame, hand_segm
+    global stop_cam, raw_frame, hand_segm, curr_gesture
 
     try:
         cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = cv2.flip(frame, 1)  # Mirroring the camera
-        raw_frame = frame.copy()
+        if not show_grid:
+            raw_frame = frame.copy()
 
         rec_img = hands_detector.process(frame)
 
         if rec_img.multi_hand_landmarks:
             hand_landmarks = rec_img.multi_hand_landmarks[0]
-            gesture, hand_segm = recognize_gesture(hand_landmarks, frame)
-            # print(gesture)
+            curr_gesture, hand_segm = recognize_gesture(hand_landmarks, frame)
         else:
-            gesture = 0
+            curr_gesture = 0
             hand_segm = 0
 
+        if show_grid:
+            raw_frame = frame.copy()
         cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         # h, w = get_cam_size()
         # cv2.resize(frame, (w, h))

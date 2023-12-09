@@ -26,14 +26,14 @@ def stop_program():
     stop_recognition()
     mouse_tracker.stop_hover_segment()
 
-    if server_t is not None:
-        server_t.join()
     if cam_t is not None:
         cam_t.join()
     if mouse_t is not None:
         mouse_t.join()
     if UI_t is not None:
         UI_t.join()
+    if server_t is not None:
+        server_t.join()
 
     print('The program shut down!')
 

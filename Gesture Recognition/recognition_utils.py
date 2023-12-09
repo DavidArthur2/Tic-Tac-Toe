@@ -89,13 +89,14 @@ def calc_hand_segment(hand_x, hand_y):
 
 
 def draw_frame(frame, hand_x, hand_y, show_pos=False, show_segment=False, show_hand=False, hand_landmarks=None,
-               show_angles=False, show_grid=False):
+               show_angles=False, show_grid=False, show_dot=False):
     (h, w) = cam_size
 
     try:
         if show_pos:
             cv2.putText(frame, f'Position_x:{hand_x}, Position_y:{hand_y}', (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
                         (0, 255, 0), 2)
+        if show_dot:
             cv2.circle(frame, (hand_x, hand_y), 5, (0, 255, 0), -1)
         # X: 0 213 426 640
         # Y: 0 160 320 480

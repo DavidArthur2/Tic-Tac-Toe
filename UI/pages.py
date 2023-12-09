@@ -51,6 +51,8 @@ Logout = threading.Event()
 Ingame = threading.Event()
 CantPut = threading.Event()
 
+cb_last_state = False
+
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
 
@@ -155,12 +157,16 @@ def secondpage():
                 continue
 
             password = hashlib.md5(values['pass'].encode()).hexdigest()
-            client.auth(values['username'], password)
+            res = client.auth(values['username'], password)
+            if not res:
+                psg.popup_error("Could not connect to the server!", font=16, text_color='red')
+                continue
             while not client.May_Login:
                 continue
             if client.May_Login == 1:
                 psg.popup_ok(f"Successful login!\nWelcome {values['username']}!", font=16)
                 player_name = values['username']
+                client.May_Login = 0
                 window.close()
                 fourthpage()
             elif client.May_Login == 2:
@@ -516,6 +522,8 @@ def sixthpage():
                 tmp = f'-{hover}-'
                 window[tmp].update(button_color='gray')
                 prev_hover = hover
+                if base_recognition.curr_gesture == 1:
+                    event = tmp
                 pass
 
             if event == psg.WIN_CLOSED or event == "Exit":
@@ -653,19 +661,28 @@ camera_list = get_available_cameras()
 
 
 def eighthpage():
-    global bgclr, window
+    global bgclr, window, cb_last_state
     text1 = psg.Text(text='Settings ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Change background color:', font=('Algerian', 15), text_color='black', background_color=bgclr)
+    text4 = psg.Text(text='Show frames on camera:', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Select preferred camera: ', font=('Algerian', 15), text_color='black',
                      background_color=bgclr)
     im = psg.Image(filename="", key="image")
-    comb = psg.Combo(values=base_recognition.cam_list, key="camera_index", readonly=True)
+    if base_recognition.cam_list is not None:
+        if len(base_recognition.cam_list) > 0:
+            comb = psg.Combo(values=base_recognition.cam_list, key="camera_index", readonly=True, default_value=base_recognition.cam_list[0])
+        else:
+            comb = psg.Combo(values=base_recognition.cam_list, key="camera_index", readonly=True)
+    else:
+        sendError('Error in pages.py/eightpage', 'Combo box got a list of None. ')
+        return
     b1 = psg.Button('Back', size=(10, 1))
     b2 = psg.Button('', size=(3, 1), key='lightblue', button_color='light blue')
     b3 = psg.Button('', size=(3, 1), key='lightgreen', button_color='light green')
     b4 = psg.Button('', size=(3, 1), key='red', button_color='red')
     b5 = psg.Button('', size=(3, 1), key='lightyellow', button_color='light yellow')
     b6 = psg.Button('Select')
+    cb = psg.Checkbox('', key='grid', background_color=bgclr)
     space1 = psg.Text('', size=(7, 1), background_color=bgclr)
     space2 = psg.Text('', size=(30, 15), background_color=bgclr)
     space3 = psg.Text('', size=(20, 1), background_color=bgclr)
@@ -676,11 +693,13 @@ def eighthpage():
     col5 = [[text3]]
     col6 = [[b1]]
     col7 = [[b6]]
+    col8 = [[text4]]
     layout = [[psg.Column(col1, background_color=bgclr, justification='c')],
               [psg.Column(col2, background_color=bgclr, justification='l'),
                psg.Column(col3, background_color=bgclr, justification='l'),
                psg.Column(col4, background_color=bgclr, justification='l')],
               [psg.Column(col5, background_color=bgclr, justification='l'), comb],
+              [psg.Column(col8, background_color=bgclr, justification='l'), cb],
               [psg.Column(col7, background_color=bgclr, justification='r'), space1],
               [space2],
               [im, space3, psg.Column(col6, background_color=bgclr, justification='c')]
@@ -729,6 +748,9 @@ def eighthpage():
         elif event == 'Back':
             window.close()
             fourthpage()
+        elif values['grid'] != cb_last_state:
+            cb_last_state = values['grid']
+            base_recognition.show_grid = values['grid']
         elif event == "Select":
             psg.popup_timed('Please wait while the camera is changing.', auto_close_duration=2)
             selected_camera = values["camera_index"]
