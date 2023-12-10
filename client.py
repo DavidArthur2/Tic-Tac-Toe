@@ -149,8 +149,8 @@ def listen_to_server():
     while not listen_stop_flag.is_set():
         try:
             data = server_socket.recv(1024)
-            if not data:
-                raise ConnectionResetError
+            if not len(data):
+                print('maybe offline?')
 
             if DEBUG:
                 print("Received from server: {}".format(data.decode('utf-8')))
@@ -177,6 +177,7 @@ def auth(username, password, reg=False):
         return True
     except Exception as e:
         sendError('Error in authentication', str(e))
+        Connected_To_Server.clear()
         return False
 
 
@@ -190,14 +191,14 @@ def send_message(msg):
 def connect_to_server():
     global server_socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(2)
+    server_socket.settimeout(5)
 
     listen_stop_flag.clear()
 
     try:
         server_socket.connect((SERVER_IP, SERVER_PORT))
         print(f"Connection to the server({SERVER_IP}:{SERVER_PORT}) was successful!")
-        threading.Thread(target=check_internet_connection).start()
+        # threading.Thread(target=check_internet_connection).start()
         Connected_To_Server.set()
         send_message('get-online-player-nb')
     except ConnectionRefusedError as e:

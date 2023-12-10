@@ -333,6 +333,7 @@ def fourthpage():
 
         if Accepted.is_set():
             Accepted.clear()
+            window.close()
             base_game.start_match(GAME_PVP)
     window.close()
 
@@ -398,6 +399,7 @@ def fifthpage():
 
         if Accepted.is_set():
             Accepted.clear()
+            window.close()
             base_game.start_match(GAME_PVP)
 
     window.close()
@@ -484,7 +486,7 @@ def sixthpage():
 
     try:
         src = base_game.current_round
-        while src == base_game.current_round:
+        while src == base_game.current_round and not match_ended:
             event, values = window.read(timeout=100)
             if base_game.sig:  # Signal for restarting the round when it's TIE
                 base_game.sig = False
@@ -598,7 +600,7 @@ def seventhpage():
     Wait_For_Request.clear()
     client.send_message('get all players')
     Wait_For_Request.wait()
-    
+
     update_leaderboard()
     while True:
         event, values = window.read(timeout=100)
@@ -635,6 +637,7 @@ def seventhpage():
 
         if Accepted.is_set():
             Accepted.clear()
+            window.close()
             base_game.start_match(GAME_PVP)
     window.close()
 
@@ -720,6 +723,7 @@ def eighthpage():
 
         if Accepted.is_set():
             Accepted.clear()
+            window.close()
             base_game.start_match(GAME_PVP)
         if event in (None, 'Exit'):
             break
@@ -825,7 +829,7 @@ def update_players_online():
 def ninthpage():
     global window, players_online_page, players_list, enemy_name
     window = psg.Window('Tic-Tac-Toe')
-    
+
     Wait_For_Request.clear()
     client.send_message('get online players')
     Wait_For_Request.wait()
@@ -876,6 +880,7 @@ def ninthpage():
 
         if Accepted.is_set():
             Accepted.clear()
+            window.close()
             base_game.start_match(GAME_PVP)
     window.close()
 
@@ -990,9 +995,9 @@ def eleventhpage():
             fourthpage()
 
         if Accepted.is_set():
+            Accepted.clear()
             window.close()
             base_game.start_match(GAME_PVP)
-            Accepted.clear()
 
     window.close()
 
@@ -1060,8 +1065,8 @@ def twelfth():
             window.close()
             fourthpage()
         elif event == 'Rematch':
-            window.close()
             Accepted.clear()
+            window.close()
             client.send_message(f'req game {enemy_name}')
             eleventhpage()
         if Logout.is_set():
@@ -1078,5 +1083,6 @@ def twelfth():
 
         if Accepted.is_set():
             Accepted.clear()
+            window.close()
             base_game.start_match(GAME_PVP)
     window.close()

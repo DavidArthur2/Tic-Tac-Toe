@@ -218,8 +218,8 @@ def next_round(tie=False):
                 tmp = PLAYER_PC if p1_won <= 1 else PLAYER_ME
             elif game_type == GAME_SAMEPC:
                 tmp = PLAYER_P2 if p1_won <= 1 else PLAYER_ME
-            else:
-                tmp = PLAYER_ME
+            elif game_type == GAME_PVP:
+                tmp = PLAYER_P2 if p1_won <= 1 else PLAYER_ME
             print(f'The winner of the match is {decode_player(tmp)}! Rounds won: {[decode_player(round_list[value]) for value in range(1, len(round_list)) if value != 0]}\n')
             if decode_player(tmp) == 'You':
                 client.send_message('won')
