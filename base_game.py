@@ -7,34 +7,13 @@ import time
 import threading
 import multiprocessing
 import pages
-
 import client
 from utils.error import sendError
-
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
+from utils.config import *
 
 queue = queue.Queue()
 
-# Defines
-LETTER_X = 1
-LETTER_O = 2
-EMPTY = 0
-
-GAME_PVP = 1
-GAME_PVE = 2
-GAME_SAMEPC = 3
-
-PLAYER_ME = 1
-PLAYER_PC = 0
-PLAYER_P2 = 2
-
-# Depending on who wins : LETTER_X / LETTER_O
-TIE = 3
-NOT_ENDED = 0
-
-# 1 2 3
-# 4 5 6
-# 7 8 9
 
 board_counter = 0  # Counts how many spaces are occupied
 starting_player = 0  # 0 - Me/P1, 1 - PC/P2
@@ -283,7 +262,6 @@ def request_put(pos, player):  # A grafikus felulet ezt hivja meg
             else:
                 if res == 1:  # Successful, so Player turn
                     current_player = not current_player
-                    # TODO: Grafikus feluleten megjeleniteni, hogy a Player1 jon
                     return 1
                 elif res == 2 and win == TIE:
                     t = threading.Timer(2, next_round, args=(True,))

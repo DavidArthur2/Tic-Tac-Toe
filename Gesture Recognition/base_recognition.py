@@ -4,11 +4,11 @@ from utils.error import *
 from gesture_recognition import recognize_gesture
 import threading
 from recognition_utils import *
+from utils.config import *
 
 # Default variables
 hands_detector = None  # A kepfelismero
 stop_cam = False
-
 
 cam = None
 raw_frame = None
@@ -19,8 +19,6 @@ cam_id = 0
 cam_list = []
 curr_gesture = 0
 show_grid = False
-detection_confidence = 0.7
-tracking_confidence = 0.5
 
 
 def list_cameras():
@@ -85,6 +83,7 @@ def process_frame(frame):
         if rec_img.multi_hand_landmarks:
             hand_landmarks = rec_img.multi_hand_landmarks[0]
             curr_gesture, hand_segm = recognize_gesture(hand_landmarks, frame)
+            print(curr_gesture)
         else:
             curr_gesture = 0
             hand_segm = 0

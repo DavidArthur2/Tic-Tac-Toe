@@ -4,14 +4,13 @@ import threading
 import sys
 import os
 import hashlib
-
 import main
-
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gesture Recognition'))
 import base_game
 import base_recognition
 from base_game import *
 from PySimpleGUI import WIN_CLOSED
+from utils.config import *
 import client
 
 bgclr = 'light blue'
@@ -29,7 +28,6 @@ leaderboard_list = [['Zoli74', 'Marci52', 'Jancsi', 'Arhur', 'Levi', 'Arnold', '
                     ['teszt1', 'teszt2']]
 list_page = 0
 leaderboard_rank = 1
-
 players_list = [[('Zoli74', 2), ('Marci52', 5), ('Jancsi', 1), ('Arhur', 7), ('Levi', 3), ('Arnold', 4), ('Janos', 6), ('Jozsi', 10)],
                 [('Jane', 12), ('Adri', 9), ('Valaki', 11), ('Megvalaki', 20)],
                 [('teszt1', 30), ('teszt2', 40)]]
@@ -50,11 +48,10 @@ Refused = threading.Event()
 Logout = threading.Event()
 Ingame = threading.Event()
 CantPut = threading.Event()
-
-cb_last_state = False
-
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
+
+cb_last_state = False
 
 
 def firstpage():
@@ -522,7 +519,7 @@ def sixthpage():
                 tmp = f'-{hover}-'
                 window[tmp].update(button_color='gray')
                 prev_hover = hover
-                if base_recognition.curr_gesture == 1:
+                if base_recognition.curr_gesture == OPEN_PALM:
                     event = tmp
                 pass
 
@@ -764,10 +761,12 @@ def eighthpage():
             main.cam_t.start()
 
             base_recognition.camInitFinished.wait()
+
             if not base_recognition.camInitialized.is_set():
                 psg.popup_error("Camera not available.")
                 base_recognition.stop_recognition()
                 return
+            psg.popup_timed('Camera changed!', auto_close_duration=2)
         if base_recognition.cam is None or base_recognition.raw_frame is None:
             break
         frame = cv2.resize(base_recognition.raw_frame, (194, 144))

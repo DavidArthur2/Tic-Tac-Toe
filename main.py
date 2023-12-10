@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     client.Connected_To_Server.wait(timeout=2)
     if not client.Connected_To_Server.is_set():
-        print('Connection to the server failed...\nCheck server up-state, and your internet connection!')
+        print('Connection to the server failed...\nCheck server up-state, and your internet connection!\n')
         stop_program()
         exit(1)
 

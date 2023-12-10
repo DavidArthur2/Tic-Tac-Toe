@@ -13,18 +13,18 @@ def recognize_gesture(hand_landmarks, frame):
 
     landmarks = hand_landmarks.landmark
 
-    if get_angle_between_fingers(landmarks[0], landmarks[4], landmarks[8]) > 23 and \
+    if get_angle_between_fingers(landmarks[0], landmarks[4], landmarks[8]) < 19 and \
+            get_angle_between_fingers(landmarks[0], landmarks[8], landmarks[12]) < 8 and \
+            get_angle_between_fingers(landmarks[0], landmarks[12], landmarks[16]) < 6 and \
+            get_angle_between_fingers(landmarks[0], landmarks[16], landmarks[20]) < 8:
+        gesture = CLOSED_PALM
+        previous_gesture = CLOSED_PALM
+    elif get_angle_between_fingers(landmarks[0], landmarks[4], landmarks[8]) > 23 and \
             get_angle_between_fingers(landmarks[0], landmarks[8], landmarks[12]) > 9 and \
             get_angle_between_fingers(landmarks[0], landmarks[12], landmarks[16]) > 7 and \
             get_angle_between_fingers(landmarks[0], landmarks[16], landmarks[20]) > 10:
         previous_gesture = OPEN_PALM
         gesture = OPEN_PALM
-    elif get_angle_between_fingers(landmarks[0], landmarks[4], landmarks[8]) < 18 and \
-            get_angle_between_fingers(landmarks[0], landmarks[8], landmarks[12]) < 7 and \
-            get_angle_between_fingers(landmarks[0], landmarks[12], landmarks[16]) < 5 and \
-            get_angle_between_fingers(landmarks[0], landmarks[16], landmarks[20]) < 7:
-        gesture = CLOSED_PALM
-        previous_gesture = CLOSED_PALM
     else:
         gesture = previous_gesture
 

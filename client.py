@@ -5,24 +5,18 @@ import re
 import ping3
 import sys
 import os
-
 import main
-
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'UI'))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 import pages
 import base_game
 from utils.error import sendError
-
+from utils.config import *
 
 server_socket: socket.socket = None
 May_Login = 0  # 0 - waiting, 1 succesful, 2 unsucc/username taken, 3 already logged in
 listen_stop_flag = threading.Event()
 Connected_To_Server = threading.Event()
-
-SERVER_PORT = 3356
-SERVER_IP = socket.gethostname()
-
 
 enemy_move = False
 
@@ -34,9 +28,8 @@ def check_internet_connection():
             ip_address = socket.gethostbyname(SERVER_IP)
             result = ping3.ping(ip_address, timeout=5)
             if result is None:
-                print('There was a problem with the internet connection. Please check!')
-                # exit(-1)
-                print('check_internet_connection ended')
+                print('There was a problem with the internet connection. Please check!\n')
+                pages.Logout.set()
                 return
         except Exception as e:
             sendError('Error in client.py/check_internet_connection', str(e))
@@ -159,7 +152,8 @@ def listen_to_server():
             if not data:
                 raise ConnectionResetError
 
-            print("Received from server: {}".format(data.decode('utf-8')))
+            if DEBUG:
+                print("Received from server: {}".format(data.decode('utf-8')))
             tmp = data.decode().split('\n')
             for msg in tmp:
                 process_msg(msg)

@@ -2,11 +2,7 @@ import cv2
 import math
 import mediapipe as mp
 import utils.error
-
-# DEFINES
-OPEN_PALM = 1
-CLOSED_PALM = 2
-#
+from utils.config import *
 
 cam_size = (480, 640)
 previous_gesture = CLOSED_PALM
@@ -109,7 +105,7 @@ def draw_frame(frame, hand_x, hand_y, show_pos=False, show_segment=False, show_h
 
         if show_segment:
             segm = calc_hand_segment(hand_x, hand_y)
-            if segm == 0:
+            if segm == 0 and DEBUG:
                 utils.error.sendError("Warning in recognition_utils.py", "In draw_frame function the segment cannot "
                                                                          "be calculated!  ", 0)
 
