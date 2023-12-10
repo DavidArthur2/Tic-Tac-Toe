@@ -83,7 +83,7 @@ def process_frame(frame):
         if rec_img.multi_hand_landmarks:
             hand_landmarks = rec_img.multi_hand_landmarks[0]
             curr_gesture, hand_segm = recognize_gesture(hand_landmarks, frame)
-            print(curr_gesture)
+            # print(curr_gesture)
         else:
             curr_gesture = 0
             hand_segm = 0
