@@ -326,6 +326,13 @@ def fourthpage():
         if Got_Inv.is_set():
             r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
+                if Canceled.set():
+                    Canceled.clear()
+                    psg.popup_timed('Canceled', 'The enemy canceled your invitation!\nReturning to menu.', button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                    Got_Inv.clear()
+                    window.close()
+                    fourthpage()
+                    return
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
@@ -388,6 +395,13 @@ def fifthpage():
         if Got_Inv.is_set():
             r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
+                if Canceled.set():
+                    Canceled.clear()
+                    psg.popup_timed('Canceled', 'The enemy canceled your invitation!\nReturning to menu.', button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                    Got_Inv.clear()
+                    window.close()
+                    fourthpage()
+                    return
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
@@ -631,6 +645,13 @@ def seventhpage():
         if Got_Inv.is_set():
             r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
+                if Canceled.set():
+                    Canceled.clear()
+                    psg.popup_timed('Canceled', 'The enemy canceled your invitation!\nReturning to menu.', button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                    Got_Inv.clear()
+                    window.close()
+                    fourthpage()
+                    return
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
@@ -716,6 +737,13 @@ def eighthpage():
         if Got_Inv.is_set():
             r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
+                if Canceled.set():
+                    Canceled.clear()
+                    psg.popup_timed('Canceled', 'The enemy canceled your invitation!\nReturning to menu.', button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                    Got_Inv.clear()
+                    window.close()
+                    fourthpage()
+                    return
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
@@ -873,6 +901,13 @@ def ninthpage():
         if Got_Inv.is_set():
             r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
+                if Canceled.set():
+                    Canceled.clear()
+                    psg.popup_timed('Canceled', 'The enemy canceled your invitation!\nReturning to menu.', button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                    Got_Inv.clear()
+                    window.close()
+                    fourthpage()
+                    return
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
@@ -981,8 +1016,9 @@ def eleventhpage():
         if event in (None, 'Exit'):
             break
         elif event == 'Cancel':
+            client.send_message('canceled')
             window.close()
-            ninthpage()
+            fourthpage()
         if Refused.is_set():
             Refused.clear()
             psg.popup_timed('Refused', f'{enemy_name} refused your invitation!', auto_close_duration=5)
@@ -1080,6 +1116,13 @@ def twelfth():
         if Got_Inv.is_set():
             r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
+                if Canceled.set():
+                    Canceled.clear()
+                    psg.popup_timed('Canceled', 'The enemy canceled your invitation!\nReturning to menu.', button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                    Got_Inv.clear()
+                    window.close()
+                    fourthpage()
+                    return
                 Got_Inv.clear()
                 client.send_message('accept game')
             else:
