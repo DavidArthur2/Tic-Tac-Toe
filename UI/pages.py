@@ -567,15 +567,15 @@ def update_leaderboard():
     space3 = psg.Text('', size=(5, 1), background_color=bgclr)
     space4 = psg.Text('', size=(5, 1), background_color=bgclr)
     col1 = [[text1]]
-    col2 = [[psg.Text(text=user, font=('Algerian', 20), text_color='black', background_color=bgclr)]
-            for user in leaderboard_list[list_page]]
-    col3 = [[psg.Text(text=f'{rank}.', font=('Algerian', 20), text_color='black', background_color=bgclr)]
-            for rank in range(leaderboard_rank, len(leaderboard_list[list_page]) + leaderboard_rank)]
-    if len(leaderboard_list[list_page]) != 10:
-        col2 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]
-                 for i in range(1, 11-len(leaderboard_list[list_page]))]
-        col3 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]
-                 for i in range(1, 11-len(leaderboard_list[list_page]))]
+    col2 = [[]]
+    col3 = [[]]
+    for user, rank in zip(leaderboard_list[list_page], range(leaderboard_rank, len(leaderboard_list[list_page]) + leaderboard_rank)):
+        if user == ' ':
+            col2 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]]
+            col3 += [[psg.Text('', font=('Algerian', 20), background_color=bgclr)]]
+        else:
+            col2 += [[psg.Text(text=user, font=('Algerian', 20), text_color='black', background_color=bgclr)]]
+            col3 += [[psg.Text(text=f'{rank}.', font=('Algerian', 20), text_color='black', background_color=bgclr)]]
     col2 += [[space3], [right_arrow]]
     col3 += [[space4], [left_arrow]]
     col4 = [[b1]]
