@@ -324,7 +324,7 @@ def fourthpage():
             window.close()
             firstpage()
         if Got_Inv.is_set():
-            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
                 Got_Inv.clear()
                 client.send_message('accept game')
@@ -386,7 +386,7 @@ def fifthpage():
             base_game.start_match(GAME_SAMEPC)
 
         if Got_Inv.is_set():
-            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
                 Got_Inv.clear()
                 client.send_message('accept game')
@@ -519,7 +519,7 @@ def sixthpage():
                 pass
             if Disconnected.is_set():
                 Disconnected.clear()
-                psg.popup_ok('Enemy disconnected! Returning to menu.')
+                psg.popup_timed('Enemy disconnected! Returning to menu.',  auto_close_duration=5)
                 window.close()
                 fourthpage()
             if 0 < hover <= 9:
@@ -629,7 +629,7 @@ def seventhpage():
                 leaderboard_rank -= len(leaderboard_list[list_page])
                 update_leaderboard()
         if Got_Inv.is_set():
-            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
                 Got_Inv.clear()
                 client.send_message('accept game')
@@ -714,7 +714,7 @@ def eighthpage():
     while True:
         event, values = window.read(timeout=100)
         if Got_Inv.is_set():
-            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
                 Got_Inv.clear()
                 client.send_message('accept game')
@@ -872,7 +872,7 @@ def ninthpage():
                 players_online_page -= 1
                 update_players_online()
         if Got_Inv.is_set():
-            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
                 Got_Inv.clear()
                 client.send_message('accept game')
@@ -986,7 +986,7 @@ def eleventhpage():
             ninthpage()
         if Refused.is_set():
             Refused.clear()
-            psg.popup_ok('Refused', f'{enemy_name} refused your invitation!')
+            psg.popup_timed('Refused', f'{enemy_name} refused your invitation!', auto_close_duration=5)
             window.close()
             fourthpage()
         if Logout.is_set():
@@ -1079,7 +1079,7 @@ def twelfth():
             window.close()
             firstpage()
         if Got_Inv.is_set():
-            r = psg.popup_yes_no("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?")
+            r = psg.popup_timed("Game invitation", f"{enemy_name} invited you to play a game!\nDo you want to accept?", button_type=psg.POPUP_BUTTONS_YES_NO, auto_close_duration=20)
             if r == "Yes":
                 Got_Inv.clear()
                 client.send_message('accept game')
