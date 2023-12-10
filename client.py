@@ -125,10 +125,11 @@ def process_msg(msg):
             if len(page) % 10 == 0 and len(page) != 0:
                 pages.players_list.append(page.copy())
                 page.clear()
-        for i in range(remain):
-            page.append(' ')
+        #for i in range(remain):
+            #page.append(' ')
 
         pages.players_list.append(page)
+        print(pages.players_list)
         pages.Wait_For_Request.set()
         return
 

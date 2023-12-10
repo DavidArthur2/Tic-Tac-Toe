@@ -803,7 +803,6 @@ def update_players_online():
         col3 = [[psg.Text('', font=('Algerian', 25), background_color=bgclr)]
                  for _ in range(1, 9)]
     else:
-        players_list[players_online_page].remove(' ')
         col2 = [[psg.Button(size=(20, 2), button_text=player_online[0], key=f'P{key}')]
                 for player_online, key in
                 zip(players_list[players_online_page], range(1, len(players_list[players_online_page]) + 1))]

@@ -34,12 +34,13 @@ def list_cameras():
 
 
 def initialize_camera():
-    global cam
+    global cam,cam_id
     list_cameras()
 
     if not len(cam_list):
         sendError('Nincs kamera', 'Nincs észlelve kamera!')
-        return False
+        cam_id = -1
+        return True
 
     cam = cv2.VideoCapture(cam_id)
 
@@ -133,6 +134,8 @@ def operate_recognition():
     camInitFinished.set()
     camInitialized.set()
 
+    if cam_id == -1:
+        stop_recognition()
     # Start capturing and recognizing
     hands_detector = mp_hands.Hands(max_num_hands=1, min_detection_confidence=detection_confidence,
                                     min_tracking_confidence=tracking_confidence)
