@@ -45,6 +45,7 @@ Ended = threading.Event()
 Accepted = threading.Event()
 Got_Inv = threading.Event()
 Refused = threading.Event()
+Disconnected = threading.Event()
 Logout = threading.Event()
 Ingame = threading.Event()
 CantPut = threading.Event()
@@ -516,7 +517,11 @@ def sixthpage():
                 tmp = f'-{prev_hover}-'
                 window[tmp].update(button_color='white')
                 pass
-
+            if Disconnected.is_set():
+                Disconnected.clear()
+                psg.popup_ok('Enemy disconnected! Returning to menu.')
+                window.close()
+                fourthpage()
             if 0 < hover <= 9:
                 tmp = f'-{hover}-'
                 window[tmp].update(button_color='gray')

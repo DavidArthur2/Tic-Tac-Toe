@@ -143,6 +143,9 @@ def process_msg(msg):
         return
     if msg == 'enemy refused':
         pages.Refused.set()
+        return
+    if msg == 'enemy disconnected':
+        pages.Disconnected.set()
 
 
 def listen_to_server():

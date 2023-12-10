@@ -100,32 +100,20 @@ def check_win():  # Returns NOT_ENDED,None; TIE,None; or WINNER,WIN_LIST; where 
 
         for i in range(0, 3):  # Looking by rows
             first = board[i][0]
-            if first == board[i][1] and first == board[i][2]:
-                win_list.append(encode_pos(i, 0))
-                win_list.append(encode_pos(i, 1))
-                win_list.append(encode_pos(i, 2))
+            if first == board[i][1] and first == board[i][2] and first != 0:
                 return first, win_list  # Winner
 
         for i in range(0, 3):  # Looking by columns
             first = board[0][i]
-            if first == board[1][i] and first == board[2][i]:
-                win_list.append(encode_pos(0, i))
-                win_list.append(encode_pos(1, i))
-                win_list.append(encode_pos(2, i))
+            if first == board[1][i] and first == board[2][i] and first != 0:
                 return first, win_list  # Winner
 
         first = board[0][0]
-        if first == board[1][1] and first == board[2][2]:
-            win_list.append(encode_pos(0, 0))
-            win_list.append(encode_pos(1, 1))
-            win_list.append(encode_pos(2, 2))
+        if first == board[1][1] and first == board[2][2] and first != 0:
             return first, win_list
 
         first = board[0][2]
-        if first == board[1][1] and first == board[2][0]:
-            win_list.append(encode_pos(0, 2))
-            win_list.append(encode_pos(1, 1))
-            win_list.append(encode_pos(2, 0))
+        if first == board[1][1] and first == board[2][0] and first != 0:
             return first, win_list
 
         if board_counter == 9:
