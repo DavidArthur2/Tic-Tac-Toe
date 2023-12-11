@@ -42,28 +42,32 @@ A Match consist of 3 rounds, where a TIE game will be repeated until there is a 
 2. Clone the repository:
 
     ```bash
-    git clone https://github.com/DavidArthur2/Tic-Tac-Toe
+   git clone https://github.com/DavidArthur2/Tic-Tac-Toe
     ```
-3. Navigate into the project folder:
+4. Navigate into the project folder:
+   
    ```bash
-    cd Tic-Tac-Toe/src
-    ```
-4. To create a virtual environment, run these commands on a terminal(Command Prompt on Windows, and Terminal on Linux):
+   cd Tic-Tac-Toe/src
+   ```
+6. To create a virtual environment, run these commands on a terminal(Command Prompt on Windows, and Terminal on Linux):
+   
    ```bash
-    python -m venv <name_of_virtualenv>
-    ```
-  5. To activate **Virtual Environment** on Windows, run the following command on CMD:
+   python -m venv <name_of_virtualenv>
+   ```
+  8. To activate **Virtual Environment** on Windows, run the following command on CMD:
+     
      ```bash
-      source <name_of_virtualenv>/bin/activate
+     source <name_of_virtualenv>/bin/activate
      ```
      To activate **Virtual Environment** on Linux, run the following command on Terminal:
+
      ```bash
-      <name_of_virtualenv>/Scripts/activate.bat
+     <name_of_virtualenv>/Scripts/activate.bat
      ```
-  6. The python environment setup:
-    ```
+  10. The python environment setup:
+      
     pip install -r requirements.txt
-    ```
+
 
 **Note: On Linux, run ```sudo apt-get install python3-tk``` to install tkinter.**
 
