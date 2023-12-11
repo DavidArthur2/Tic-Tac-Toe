@@ -14,7 +14,6 @@ from utils.config import *
 import client
 
 root_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
-
 bgclr = 'light blue'
 
 camera_index = 0
@@ -53,6 +52,7 @@ Ingame = threading.Event()
 CantPut = threading.Event()
 Wait_For_Request = threading.Event()
 Stopped = threading.Event()
+Canceled = threading.Event()
 
 cb_last_state = False
 
@@ -427,17 +427,17 @@ def put_on_window(pos, letter):  # 1 ha X, 2 ha O, POS: 1-9 ig
     tmp = f'-{pos}-'
     buttons[pos - 1] = 1
     if letter == 'X':
-        window[tmp].update(image_filename='UI/X.png')
+        window[tmp].update(image_filename=root_dir + 'X.png')
     else:
-        window[tmp].update(image_filename='UI/O.png')
+        window[tmp].update(image_filename=root_dir + 'O.png')
 
 
 def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
     global window
     if outcome == 0:
-        window[f'{round}.round'].update(image_filename='UI/roundX.png')
+        window[f'{round}.round'].update(image_filename=root_dir + 'roundX.png')
     else:
-        window[f'{round}.round'].update(image_filename='UI/roundCheck.png')
+        window[f'{round}.round'].update(image_filename=root_dir + 'roundCheck.png')
 
 
 def sixthpage():
@@ -455,29 +455,29 @@ def sixthpage():
         text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
         text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
         text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
-        b1 = psg.Button('', key='-1-', button_color='white', image_filename='UI/background.png')
-        b2 = psg.Button('', key='-2-', button_color='white', image_filename='UI/background.png')
-        b3 = psg.Button('', key='-3-', button_color='white', image_filename='UI/background.png')
-        b4 = psg.Button('', key='-4-', button_color='white', image_filename='UI/background.png')
-        b5 = psg.Button('', key='-5-', button_color='white', image_filename='UI/background.png')
-        b6 = psg.Button('', key='-6-', button_color='white', image_filename='UI/background.png')
-        b7 = psg.Button('', key='-7-', button_color='white', image_filename='UI/background.png')
-        b8 = psg.Button('', key='-8-', button_color='white', image_filename='UI/background.png')
-        b9 = psg.Button('', key='-9-', button_color='white', image_filename='UI/background.png')
+        b1 = psg.Button('', key='-1-', button_color='white', image_filename=root_dir + 'background.png')
+        b2 = psg.Button('', key='-2-', button_color='white', image_filename=root_dir + 'background.png')
+        b3 = psg.Button('', key='-3-', button_color='white', image_filename=root_dir + 'background.png')
+        b4 = psg.Button('', key='-4-', button_color='white', image_filename=root_dir + 'background.png')
+        b5 = psg.Button('', key='-5-', button_color='white', image_filename=root_dir + 'background.png')
+        b6 = psg.Button('', key='-6-', button_color='white', image_filename=root_dir + 'background.png')
+        b7 = psg.Button('', key='-7-', button_color='white', image_filename=root_dir + 'background.png')
+        b8 = psg.Button('', key='-8-', button_color='white', image_filename=root_dir + 'background.png')
+        b9 = psg.Button('', key='-9-', button_color='white', image_filename=root_dir + 'background.png')
         if base_game.current_round != 1:
             for i in range(len(round_list)):
-                t = 'UI/roundBlank.png'
+                t = 'roundBlank.png'
                 kei = f'{i}.round'
                 if round_list[i] != -1:
                     if round_list[i] == PLAYER_ME:
-                        t = 'UI/roundCheck.png'
+                        t = 'roundCheck.png'
                     elif round_list[i] == PLAYER_PC or round_list[i] == PLAYER_P2:
-                        t = 'UI/roundX.png'
-                roundd[i] = psg.Button('', key=kei, button_color='white', image_filename=t)
+                        t = 'roundX.png'
+                roundd[i] = psg.Button('', key=kei, button_color='white', image_filename=root_dir + t)
         else:
-            roundd[1] = psg.Button('', key='1.round', button_color='white', image_filename='UI/roundBlank.png')
-            roundd[2] = psg.Button('', key='2.round', button_color='white', image_filename='UI/roundBlank.png')
-            roundd[3] = psg.Button('', key='3.round', button_color='white', image_filename='UI/roundBlank.png')
+            roundd[1] = psg.Button('', key='1.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
+            roundd[2] = psg.Button('', key='2.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
+            roundd[3] = psg.Button('', key='3.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
 
         im = psg.Image(filename="", key="image")
         space1 = psg.Text('', size=(30, 1), background_color=bgclr)
@@ -515,13 +515,13 @@ def sixthpage():
                 r, _ = base_game.check_win()
                 if r != TIE:
                     kei = f'{base_game.current_round}.round'
-                    t = 'UI/roundCheck.png'
+                    t = 'roundCheck.png'
                     if base_game.round_list[base_game.current_round] == PLAYER_PC or base_game.round_list[base_game.current_round] == PLAYER_P2:
-                        t = 'UI/roundX.png'
-                    window[kei].update(image_filename=t)
+                        t = 'roundX.png'
+                    window[kei].update(image_filename=root_dir + t)
                 else:
                     kei = f'{base_game.current_round}.round'
-                    window[kei].update(image_filename='UI/roundBlank.png')
+                    window[kei].update(image_filename=root_dir + 'roundBlank.png')
                     print('updated')
             # 194, 144
             if base_recognition.raw_frame is not None:  # Make image if it is initaialized and in use
@@ -583,8 +583,8 @@ def update_leaderboard():
     global window, leaderboard_list, list_page, leaderboard_rank
     text1 = psg.Text(text='Leaderboard: ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     b1 = psg.Button('Back', size=(10, 1), key='-back-')
-    right_arrow = psg.Button('', image_filename='UI/right_arrow.png', key='-right-')
-    left_arrow = psg.Button('', image_filename='UI/left_arrow.png', key='-left-')
+    right_arrow = psg.Button('', image_filename=root_dir + 'right_arrow.png', key='-right-')
+    left_arrow = psg.Button('', image_filename=root_dir + 'left_arrow.png', key='-left-')
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     space2 = psg.Text('', size=(5, 1), background_color=bgclr)
     space3 = psg.Text('', size=(5, 1), background_color=bgclr)
@@ -820,8 +820,8 @@ def update_players_online():
     text2 = psg.Text(text='Players online: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text3 = psg.Text(text='Rank: ', font=('Algerian', 15), text_color='black', background_color=bgclr)
     b1 = psg.Button('Back', size=(10, 1))
-    right_arrow = psg.Button('', image_filename='UI/right_arrow.png', key='-right-')
-    left_arrow = psg.Button('', image_filename='UI/left_arrow.png', key='-left-')
+    right_arrow = psg.Button('', image_filename=root_dir + 'right_arrow.png', key='-right-')
+    left_arrow = psg.Button('', image_filename=root_dir + 'left_arrow.png', key='-left-')
     space1 = psg.Text('', size=(5, 1), background_color=bgclr)
     space2 = psg.Text('', size=(18, 1), background_color=bgclr)
     space3 = psg.Text('', size=(15, 1), background_color=bgclr)
@@ -932,18 +932,18 @@ def tenthpage():
     text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
     text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    b1 = psg.Button('', key='-1-', button_color='white', image_filename='background.png')
-    b2 = psg.Button('', key='-2-', button_color='white', image_filename='background.png')
-    b3 = psg.Button('', key='-3-', button_color='white', image_filename='background.png')
-    b4 = psg.Button('', key='-4-', button_color='white', image_filename='background.png')
-    b5 = psg.Button('', key='-5-', button_color='white', image_filename='background.png')
-    b6 = psg.Button('', key='-6-', button_color='white', image_filename='background.png')
-    b7 = psg.Button('', key='-7-', button_color='white', image_filename='background.png')
-    b8 = psg.Button('', key='-8-', button_color='white', image_filename='background.png')
-    b9 = psg.Button('', key='-9-', button_color='white', image_filename='background.png')
-    round1 = psg.Button('', key='1.round', button_color='white', image_filename='roundBlank.png')
-    round2 = psg.Button('', key='2.round', button_color='white', image_filename='roundBlank.png')
-    round3 = psg.Button('', key='3.round', button_color='white', image_filename='roundBlank.png')
+    b1 = psg.Button('', key='-1-', button_color='white', image_filename=root_dir + 'background.png')
+    b2 = psg.Button('', key='-2-', button_color='white', image_filename=root_dir + 'background.png')
+    b3 = psg.Button('', key='-3-', button_color='white', image_filename=root_dir + 'background.png')
+    b4 = psg.Button('', key='-4-', button_color='white', image_filename=root_dir + 'background.png')
+    b5 = psg.Button('', key='-5-', button_color='white', image_filename=root_dir + 'background.png')
+    b6 = psg.Button('', key='-6-', button_color='white', image_filename=root_dir + 'background.png')
+    b7 = psg.Button('', key='-7-', button_color='white', image_filename=root_dir + 'background.png')
+    b8 = psg.Button('', key='-8-', button_color='white', image_filename=root_dir + 'background.png')
+    b9 = psg.Button('', key='-9-', button_color='white', image_filename=root_dir + 'background.png')
+    round1 = psg.Button('', key='1.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
+    round2 = psg.Button('', key='2.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
+    round3 = psg.Button('', key='3.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     space2 = psg.Text('', size=(30, 1), background_color=bgclr)
     col1 = [[text1]]

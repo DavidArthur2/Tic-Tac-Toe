@@ -2,7 +2,7 @@ import socket
 
 DEBUG = True
 SERVER_PORT = 3356
-SERVER_IP = socket.gethostname()
+SERVER_IP = 'arthurpc.go.ro'
 
 LETTER_X = 1
 LETTER_O = 2

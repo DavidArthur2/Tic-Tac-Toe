@@ -15,6 +15,7 @@ import mouse_tracker
 import client
 
 
+
 cam_t = None
 mouse_t = None
 server_t = None
@@ -39,7 +40,6 @@ def stop_program():
 
 
 if __name__ == '__main__':
-    print(os.path.dirname(os.path.abspath(__file__)))
     print('Connecting to the server...')
     server_t = threading.Thread(target=client.connect_to_server)
     server_t.start()
