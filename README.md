@@ -50,7 +50,7 @@ A Match consist of 3 rounds, where a TIE game will be repeated until there is a 
     ```
 4. To create a virtual environment, run these commands on a terminal(Command Prompt on Windows, and Terminal on Linux):
    ```bash
-    python3 -m venv <name_of_virtualenv>
+    python -m venv <name_of_virtualenv>
     ```
   5. To activate **Virtual Environment** on Windows, run the following command on CMD:
      ```bash
