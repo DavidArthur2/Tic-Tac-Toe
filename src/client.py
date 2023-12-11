@@ -170,6 +170,7 @@ def listen_to_server():
             break
     server_socket.close()
     print('You have been disconnected from the server!')
+    Connected_To_Server.clear()
     pages.Logout.set()
 
 

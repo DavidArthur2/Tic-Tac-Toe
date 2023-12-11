@@ -698,6 +698,9 @@ camera_list = get_available_cameras()
 
 def eighthpage():
     global bgclr, window, cb_last_state
+    if base_recognition.cam_id == -1:
+        psg.popup_timed("Cam scanning in progress...", auto_close_duration=3, button_type=psg.POPUP_BUTTONS_OK)
+        base_recognition.list_cameras()
     text1 = psg.Text(text='Settings ', font=('Algerian', 40), text_color='black', background_color=bgclr)
     text2 = psg.Text(text='Change background color:', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text4 = psg.Text(text='Show frames on camera:', font=('Algerian', 15), text_color='black', background_color=bgclr)
@@ -710,7 +713,7 @@ def eighthpage():
         else:
             comb = psg.Combo(values=base_recognition.cam_list, key="camera_index", readonly=True)
     else:
-        sendError('Error in pages.py/eightpage', 'Combo box got a list of None. ')
+        sendError('Error in pages.py/eighthpage', 'Combo box got a list of None. ')
         return
     b1 = psg.Button('Back', size=(10, 1))
     b2 = psg.Button('', size=(3, 1), key='lightblue', button_color='light blue')
@@ -795,7 +798,9 @@ def eighthpage():
         elif values['grid'] != cb_last_state:
             cb_last_state = values['grid']
             base_recognition.show_grid = values['grid']
-        elif event == "Select":
+        elif event == "Select" and not len(base_recognition.cam_list):
+            psg.popup_timed('No camera was found!',button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+        elif event == "Select" and len(base_recognition.cam_list):
             psg.popup_timed('Please wait while the camera is changing.', auto_close_duration=2)
             selected_camera = values["camera_index"]
             global camera_index
@@ -815,7 +820,7 @@ def eighthpage():
                 return
             psg.popup_timed('Camera changed!', auto_close_duration=2)
         if base_recognition.cam is None or base_recognition.raw_frame is None:
-            break
+            continue
         frame = cv2.resize(base_recognition.raw_frame, (194, 144))
         imgbytes = cv2.imencode(".png", frame)[1].tobytes()
         window["image"].update(data=imgbytes)

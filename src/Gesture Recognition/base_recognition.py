@@ -34,7 +34,7 @@ def list_cameras():
 
 
 def initialize_camera():
-    global cam,cam_id
+    global cam, cam_id
     list_cameras()
 
     if not len(cam_list):
@@ -59,12 +59,14 @@ def initialize_camera():
 
 
 def capture_frame():
+    global cam_id
     while cam.isOpened() and not stop_cam:
 
         res, frame = cam.read()
 
         if not res and not stop_cam:
             sendError("Hiba a kamerával", "Megszakadt a kapcsolat a kamerával!")
+            cam_id = -1
             return False
 
         process_frame(frame)
@@ -136,6 +138,7 @@ def operate_recognition():
 
     if cam_id == -1:
         stop_recognition()
+        return
     # Start capturing and recognizing
     hands_detector = mp_hands.Hands(max_num_hands=1, min_detection_confidence=detection_confidence,
                                     min_tracking_confidence=tracking_confidence)
