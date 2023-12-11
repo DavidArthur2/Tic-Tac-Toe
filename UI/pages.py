@@ -1169,8 +1169,8 @@ def thirteenthpage():
     text11 = psg.Text(text='Tutorial', font=('Algerian', 20), text_color='black', background_color=bgclr)
     text12 = psg.Text(text='First image', font=('Algerian', 15), text_color='black', background_color=bgclr)
     text13 = psg.Text(text='Second image', font=('Algerian', 15), text_color='black', background_color=bgclr)
-    button1 = psg.Button(image_filename='fingers_closed.png')
-    button2 = psg.Button(image_filename='fingers_open.png')
+    button1 = psg.Button(image_filename=root_dir + 'fingers_closed.png')
+    button2 = psg.Button(image_filename=root_dir + 'fingers_open.png')
     button3 = psg.Button('Back', size=(10, 1))
     space1 = psg.Text('', size=(30, 1), background_color=bgclr)
     col1 = [[button1], [text12]]
