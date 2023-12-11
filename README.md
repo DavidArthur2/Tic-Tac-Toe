@@ -75,7 +75,7 @@ A Match consist of 3 rounds, where a TIE game will be repeated until there is a 
    ```cd C:\Windows\Fonts```
 3. Paste the following code, where <your_project_folder> whould be replaced with the project folder location:
    
-   ```copy <your_project_folder>/Tic-Tac-Toe/src/UI/fonts/algerian.ttf```
+   ```copy "<your_project_folder>/Tic-Tac-Toe/src/UI/fonts/Algerian Regular.ttf"```
 
 ### Running the Game
 
