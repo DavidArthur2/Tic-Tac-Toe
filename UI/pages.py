@@ -435,9 +435,14 @@ def sixthpage():
         sendError('Warning in pages.py/sixthpage', 'Queue not empty on initializing page!\n'+answ, 0)
     try:
         roundd = [None, None, None, None]
-        text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
-        text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
-        text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
+        if len(enemy_name) < 7:
+            text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
+            text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
+            text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
+        else:
+            text1 = psg.Text(text='You ', font=('Algerian', 20), text_color='black', background_color=bgclr)
+            text2 = psg.Text(text='vs. ', font=('Algerian', 10), text_color='black', background_color=bgclr)
+            text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 20), text_color='black', background_color=bgclr)
         text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
         b1 = psg.Button('', key='-1-', button_color='white', image_filename='UI/background.png')
         b2 = psg.Button('', key='-2-', button_color='white', image_filename='UI/background.png')
