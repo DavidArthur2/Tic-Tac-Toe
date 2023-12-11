@@ -1201,6 +1201,3 @@ def thirteenthpage():
         elif event == 'Back':
             window.close()
             fourthpage()
-
-
-thirteenthpage()
