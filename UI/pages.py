@@ -13,6 +13,8 @@ from PySimpleGUI import WIN_CLOSED
 from utils.config import *
 import client
 
+root_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
+
 bgclr = 'light blue'
 
 camera_index = 0
