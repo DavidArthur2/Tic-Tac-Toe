@@ -320,6 +320,9 @@ def fourthpage():
         elif event == 'PVE':
             window.close()
             base_game.start_match(GAME_PVE)
+        elif event == 'Tutorial':
+            window.close()
+            thirteenthpage()
 
         if Logout.is_set():
             Logout.clear()
@@ -451,9 +454,14 @@ def sixthpage():
         sendError('Warning in pages.py/sixthpage', 'Queue not empty on initializing page!\n'+answ, 0)
     try:
         roundd = [None, None, None, None]
-        text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
-        text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
-        text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
+        if len(enemy_name) < 7:
+            text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
+            text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
+            text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
+        else:
+            text1 = psg.Text(text='You ', font=('Algerian', 20), text_color='black', background_color=bgclr)
+            text2 = psg.Text(text='vs. ', font=('Algerian', 10), text_color='black', background_color=bgclr)
+            text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 20), text_color='black', background_color=bgclr)
         text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
         b1 = psg.Button('', key='-1-', button_color='white', image_filename=root_dir + 'background.png')
         b2 = psg.Button('', key='-2-', button_color='white', image_filename=root_dir + 'background.png')
@@ -1135,3 +1143,61 @@ def twelfth():
             window.close()
             base_game.start_match(GAME_PVP)
     window.close()
+
+
+def thirteenthpage():
+    global window
+    text1 = psg.Text(text='Tic-Tac-Toe', font=('Algerian', 40), text_color='black', background_color=bgclr)
+    text2 = psg.Text(text='You can control the game with a mouse or using a', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text3 = psg.Text(text='camera. If you choose the camera, you will control', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text4 = psg.Text(text='the game with hand gestures. Here I will present you', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text5 = psg.Text(text='how you can use your hand to move the cursor on the ', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text6 = psg.Text(text='playfield. You can see two images below, the first', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text7 = psg.Text(text='one shows you how you need to keep your hand to', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text8 = psg.Text(text=' move the grey square around. The second image', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text9 = psg.Text(text=' shows you how you can lock the grey squares', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text10 = psg.Text(text='position and place your move.', font=('Algerian', 12),
+                     text_color='black', background_color=bgclr)
+    text11 = psg.Text(text='Tutorial', font=('Algerian', 20), text_color='black', background_color=bgclr)
+    text12 = psg.Text(text='First image', font=('Algerian', 15), text_color='black', background_color=bgclr)
+    text13 = psg.Text(text='Second image', font=('Algerian', 15), text_color='black', background_color=bgclr)
+    button1 = psg.Button(image_filename=root_dir + 'fingers_closed.png')
+    button2 = psg.Button(image_filename=root_dir + 'fingers_open.png')
+    button3 = psg.Button('Back', size=(10, 1))
+    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
+    col1 = [[button1], [text12]]
+    col2 = [[button2], [text13]]
+    col3 = [[button3]]
+    layout = [[text1],
+              [text11],
+              [text2],
+              [text3],
+              [text4],
+              [text5],
+              [text6],
+              [text7],
+              [text8],
+              [text9],
+              [text10],
+              [psg.Column(col1, background_color=bgclr, justification='c'),
+               psg.Column(col2, background_color=bgclr, justification='c')],
+              [space1],
+              [psg.Column(col3, background_color=bgclr, justification='r')]
+              ]
+    window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
+                        element_justification='c', finalize=True)
+    while True:
+        event, values = window.read(timeout=100)
+        if event in (None, 'Exit'):
+            break
+        elif event == 'Back':
+            window.close()
+            fourthpage()
