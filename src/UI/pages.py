@@ -6,12 +6,14 @@ import os
 import hashlib
 import main
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'Gesture Recognition'))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils'))
 import base_game
 import base_recognition
 from base_game import *
 from PySimpleGUI import WIN_CLOSED
 from utils.config import *
 import client
+import time
 
 root_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
 bgclr = 'light blue'
@@ -749,8 +751,8 @@ def eighthpage():
                psg.Column(col3, background_color=bgclr, justification='l'),
                psg.Column(col4, background_color=bgclr, justification='l')],
               [psg.Column(col5, background_color=bgclr, justification='l'), comb],
-              [psg.Column(col8, background_color=bgclr, justification='l'), cb],
               [psg.Column(col7, background_color=bgclr, justification='r'), space1],
+              [psg.Column(col8, background_color=bgclr, justification='l'), cb],
               [space2],
               [im, space3, psg.Column(col6, background_color=bgclr, justification='c')]
               ]
@@ -947,72 +949,6 @@ def ninthpage():
             Accepted.clear()
             window.close()
             base_game.start_match(GAME_PVP)
-    window.close()
-
-
-def tenthpage():
-    global window
-    text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
-    text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
-    text4 = psg.Text(text='Round:', font=('Algerian', 20), text_color='black', background_color=bgclr)
-    b1 = psg.Button('', key='-1-', button_color='white', image_filename=root_dir + 'background.png')
-    b2 = psg.Button('', key='-2-', button_color='white', image_filename=root_dir + 'background.png')
-    b3 = psg.Button('', key='-3-', button_color='white', image_filename=root_dir + 'background.png')
-    b4 = psg.Button('', key='-4-', button_color='white', image_filename=root_dir + 'background.png')
-    b5 = psg.Button('', key='-5-', button_color='white', image_filename=root_dir + 'background.png')
-    b6 = psg.Button('', key='-6-', button_color='white', image_filename=root_dir + 'background.png')
-    b7 = psg.Button('', key='-7-', button_color='white', image_filename=root_dir + 'background.png')
-    b8 = psg.Button('', key='-8-', button_color='white', image_filename=root_dir + 'background.png')
-    b9 = psg.Button('', key='-9-', button_color='white', image_filename=root_dir + 'background.png')
-    round1 = psg.Button('', key='1.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
-    round2 = psg.Button('', key='2.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
-    round3 = psg.Button('', key='3.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
-    space1 = psg.Text('', size=(30, 1), background_color=bgclr)
-    space2 = psg.Text('', size=(30, 1), background_color=bgclr)
-    col1 = [[text1]]
-    col2 = [[b1], [b4], [b7]]
-    col3 = [[b2], [b5], [b8]]
-    col4 = [[b3], [b6], [b9]]
-    col5 = [[text4]]
-    layout = [[psg.Column(col1, background_color=bgclr, justification='c'), text2, text3],
-              [space2],
-              [psg.Column(col5, background_color=bgclr, justification='l'), round1, round2, round3],
-              [space1],
-              [psg.Column(col2, background_color=bgclr, justification='c'),
-               psg.Column(col3, background_color=bgclr, justification='c'),
-               psg.Column(col4, background_color=bgclr, justification='c')]
-              ]
-    window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
-                        element_justification='c', finalize=True)
-    x = 0
-    while True:
-        event, values = window.read(timeout=100)
-
-        if event == WIN_CLOSED:
-            main.stop_program()
-            break
-        elif event == 'Back':
-            window.close()
-            fourthpage()
-        elif not queue.empty():  # Berakja a varakozasban levo lepest
-            raw = queue.get()
-            raw = raw.split()
-            pos = int(raw[0])
-            letter = raw[1]
-            put_on_window(pos, letter)
-        else:  # Ha egyiksem teljesul, megnezzuk, hogy lépett e a képernyőn a player, és azt rakjuk
-            global buttons
-            for i in range(1, 10):
-                tmp = f'-{i}-'
-                if event == tmp and buttons[i - 1] == 0:
-                    letter = 'O'
-                    if x:
-                        letter = 'X'
-                    put_on_window(i, letter)
-                    x = not x
-                    break
-
     window.close()
 
 
