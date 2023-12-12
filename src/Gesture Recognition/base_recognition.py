@@ -76,6 +76,8 @@ def process_frame(frame):
     global stop_cam, raw_frame, hand_segm, curr_gesture
 
     try:
+        if stop_cam:
+            return
         cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = cv2.flip(frame, 1)  # Mirroring the camera
         if not show_grid:

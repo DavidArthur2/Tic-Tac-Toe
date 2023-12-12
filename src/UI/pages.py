@@ -85,17 +85,20 @@ def firstpage():
               [psg.Column(col3, background_color=bgclr, justification='r'), text3]]
     window = psg.Window('Tic-Tac-Toe', layout, size=(480, 640), background_color=bgclr,
                         element_justification='c', finalize=True)
-
+    print('UI started!\n')
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
-            break
+            window.close()
+            main.stop_program()
+            return
         elif event == 'Login':
             if not client.Connected_To_Server.is_set():
                 client.connect_to_server()
                 client.Connected_To_Server.wait()
             window.close()
             secondpage()
+            break
         elif event == 'Register':
             if not client.Connected_To_Server.is_set():
                 client.connect_to_server()
@@ -144,6 +147,8 @@ def secondpage():
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
+            window.close()
+            main.stop_program()
             break
         elif event == 'Show Password':
             show_password = not show_password
@@ -169,6 +174,7 @@ def secondpage():
                 client.May_Login = 0
                 window.close()
                 fourthpage()
+                break
             elif client.May_Login == 2:
                 psg.popup_ok("Incorrect credentials!", font=16, text_color='red')
                 client.May_Login = 0
@@ -222,6 +228,8 @@ def thirdpage():
     while True:
         event, values = window.read()
         if event in (None, 'Exit'):
+            window.close()
+            main.stop_program()
             break
         elif event == 'Show Password':
             show_password = not show_password
@@ -302,6 +310,7 @@ def fourthpage():
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
+            main.stop_program()
             break
         elif event == 'Logout':
             client.May_Login = 0
@@ -349,6 +358,7 @@ def fourthpage():
             window.close()
             base_game.start_match(GAME_PVP)
     window.close()
+    return
 
 
 def fifthpage():
@@ -385,6 +395,7 @@ def fifthpage():
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
+            main.stop_program()
             break
         elif event == 'Back':
             window.close()
@@ -555,7 +566,6 @@ def sixthpage():
                 pass
 
             if event == psg.WIN_CLOSED or event == "Exit":
-                window.close()
                 main.stop_program()
                 break
             if Logout.is_set():
@@ -636,6 +646,7 @@ def seventhpage():
         if event in (None, 'Exit'):
             leaderboard_rank = 1
             list_page = 0
+            main.stop_program()
             break
         elif event == '-back-':
             leaderboard_rank = 1
@@ -772,6 +783,8 @@ def eighthpage():
             window.close()
             base_game.start_match(GAME_PVP)
         if event in (None, 'Exit'):
+            window.close()
+            main.stop_program()
             break
         elif event == 'Back':
             window.close()
@@ -792,9 +805,6 @@ def eighthpage():
             bgclr = 'light yellow'
             window.close()
             eighthpage()
-        elif event == 'Back':
-            window.close()
-            fourthpage()
         elif values['grid'] != cb_last_state:
             cb_last_state = values['grid']
             base_recognition.show_grid = values['grid']
@@ -886,6 +896,7 @@ def ninthpage():
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
             players_online_page = 0
+            main.stop_program()
             break
         elif event == 'Back':
             players_online_page = 0
@@ -979,6 +990,7 @@ def tenthpage():
         event, values = window.read(timeout=100)
 
         if event == WIN_CLOSED:
+            main.stop_program()
             break
         elif event == 'Back':
             window.close()
@@ -1029,6 +1041,7 @@ def eleventhpage():
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
+            main.stop_program()
             break
         elif event == 'Cancel':
             client.send_message('canceled')
@@ -1115,6 +1128,7 @@ def twelfth():
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
+            main.stop_program()
             break
         elif event == 'Go to menu':
             window.close()
@@ -1202,6 +1216,7 @@ def thirteenthpage():
     while True:
         event, values = window.read(timeout=100)
         if event in (None, 'Exit'):
+            main.stop_program()
             break
         elif event == 'Back':
             window.close()

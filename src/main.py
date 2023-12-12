@@ -15,14 +15,19 @@ import mouse_tracker
 import client
 
 
-
 cam_t = None
 mouse_t = None
 server_t = None
 UI_t = None
+program_stop_called = False
 
 
 def stop_program():
+    global program_stop_called
+    if program_stop_called:
+        return
+
+    program_stop_called = True
     client.stop_connection()
     stop_recognition()
     mouse_tracker.stop_hover_segment()
@@ -44,9 +49,9 @@ if __name__ == '__main__':
     server_t = threading.Thread(target=client.connect_to_server)
     server_t.start()
 
-    client.Connected_To_Server.wait(timeout=2)
+    client.Connected_To_Server.wait(timeout=5)
     if not client.Connected_To_Server.is_set():
-        print('Connection to the server failed...\nCheck server up-state, and your internet connection!\n')
+        print('Connection to the server failed...\n')
         stop_program()
         exit(1)
 
@@ -66,16 +71,15 @@ if __name__ == '__main__':
 
     print('Starting UI...')
     UI_t = threading.Thread(target=pages.firstpage)
-    UI_t.start()
-    print('UI started!\n')
+    pages.firstpage()
 
 
 
 
 
 
-# Innen meghivando jatek elejen: client.connect_to_server - kulon thread
-# operate_recognition - kulon thread
-# mouse_tracker.get_hover_segment - kulon thread
-# firstpage - kulon thread
-# A start_match CSAK a pagekrol hivhato, NEM kulon threadkent, hogy nelegyen gond a main_loop threades faszsaggal
+# To start the application you shold call: client.connect_to_server - separate thread
+# operate_recognition - separate thread
+# mouse_tracker.get_hover_segment - separate thread
+# firstpage - separate thread
+# The start_match will be called from the UI

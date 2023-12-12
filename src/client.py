@@ -169,9 +169,7 @@ def listen_to_server():
             sendError('Server closed the connection', 'Most probably the server shut down!')
             break
     server_socket.close()
-    print('You have been disconnected from the server!')
     Connected_To_Server.clear()
-    pages.Logout.set()
 
 
 def auth(username, password, reg=False):
@@ -211,7 +209,8 @@ def connect_to_server():
         sendError('An error occured in client.py/connect_to_server', 'Connection refused by the server! ' + str(e))
         return None
     except Exception as e:
-        sendError('An error occured in client.py/connect_to_server', str(e))
+        if str(e) != 'timed out':
+            sendError('An error occured in client.py/connect_to_server', str(e))
         return None
 
     listen_th = threading.Thread(target=listen_to_server)
