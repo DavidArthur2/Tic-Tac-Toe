@@ -3,8 +3,11 @@ import cv2
 import math
 from recognition_utils import *
 
+previous_gesture = CLOSED_PALM
+
 
 def recognize_gesture(hand_landmarks, frame):
+    global previous_gesture
 
     pos_x, pos_y = calc_median_pos(hand_landmarks, frame)  # Calculates the midpoint of the hand
 

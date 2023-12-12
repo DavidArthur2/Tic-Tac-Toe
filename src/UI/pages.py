@@ -524,10 +524,18 @@ def sixthpage():
                             element_justification='c')
     except Exception as e:
         sendError("Error in pages.py/sixthpage/Window-creation", str(e))
-
+    cycle = 0
     try:
         src = base_game.current_round
         while src == base_game.current_round and not match_ended:
+
+            if cycle == 1:  # Some PySimpleGUI shit
+                psg.popup_timed(f'The starting player is: {base_game.decode_player(base_game.starting_player)}',
+                            button_type=psg.POPUP_BUTTONS_OK, auto_close_duration=2)
+                cycle = 2
+            if not cycle:
+                cycle = 1
+
             event, values = window.read(timeout=100)
 
             if base_game.sig:  # Signal for restarting the round when it's TIE
