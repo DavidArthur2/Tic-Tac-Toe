@@ -4,7 +4,7 @@ import mediapipe as mp
 import utils.error
 from utils.config import *
 
-cam_size = (480, 640)
+cam_size = (480, 640)  # The default size if not setted
 previous_gesture = CLOSED_PALM
 
 mp_hands = mp.solutions.hands  # Used class for hand recognition
@@ -20,7 +20,8 @@ def get_cam_size():
     return cam_size
 
 
-def calc_median_pos(hand_landmarks, frame):
+def calc_median_pos(hand_landmarks, frame):  # Calculates the midpoint of the hand
+    # It uses a weighted method, the factors were determined with observation
     try:
         (h, w) = cam_size
 
@@ -52,8 +53,8 @@ def calc_median_pos(hand_landmarks, frame):
 # 1 2 3
 # 4 5 6
 # 7 8 9
-# 0 ha nem felismerhető - hiba
-def calc_hand_segment(hand_x, hand_y):
+# 0 if not recognizable - warning
+def calc_hand_segment(hand_x, hand_y):  # Calculates the hand's segment hovered on
     segment = 0
     (h, w) = cam_size
 
@@ -73,7 +74,7 @@ def calc_hand_segment(hand_x, hand_y):
         if int(2*h/3) <= hand_y <= int(3*h/3):  # third row
             segment = 8
 
-    if int(2*w/3) <= hand_x <= int(3*w/3):  # first column
+    if int(2*w/3) <= hand_x <= int(3*w/3):  # third column
         if 0 <= hand_y < int(h/3):  # first row
             segment = 3
         if int(h/3) <= hand_y < int(2*h/3):  # second row
@@ -85,7 +86,7 @@ def calc_hand_segment(hand_x, hand_y):
 
 
 def draw_frame(frame, hand_x, hand_y, show_pos=False, show_segment=False, show_hand=False, hand_landmarks=None,
-               show_angles=False, show_grid=False, show_dot=False):
+               show_angles=False, show_grid=False, show_dot=False):  # Drawing on the frame with the options
     (h, w) = cam_size
 
     try:
@@ -128,7 +129,8 @@ def draw_frame(frame, hand_x, hand_y, show_pos=False, show_segment=False, show_h
         return False
 
 
-def get_angle_between_fingers(mid_point, finger_1, finger_2):
+def get_angle_between_fingers(mid_point, finger_1, finger_2):  # Calculates the angle between 3 landmark points
+    # 2 fingerpoint and 1 midpoint
     try:
 
         f1 = (finger_1.x, finger_1.y)

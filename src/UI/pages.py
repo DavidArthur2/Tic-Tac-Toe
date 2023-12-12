@@ -15,25 +15,27 @@ from utils.config import *
 import client
 import time
 
-root_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
-bgclr = 'light blue'
+root_dir = os.path.dirname(os.path.abspath(__file__)) + '/'  # The absolute path for resources
 
+bgclr = 'light blue'
 camera_index = 0
-position = None
+position = None  # The position of the window for the mouse hovering calculations
 window = None
 win = None
-prev_hover = 0
+
+prev_hover = 0  # Used to color back the unhovered button
 hover = 0
+
 buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 leaderboard_list = [['Zoli74', 'Marci52', 'Jancsi', 'Arhur', 'Levi', 'Arnold', 'Janos', 'Jozsi', 'Robi', 'James'],
                     ['Jane', 'Adri', 'Valaki', 'Megvalaki'],
-                    ['teszt1', 'teszt2']]
+                    ['teszt1', 'teszt2']]  # Let uncleared for testing purposes
 list_page = 0
 leaderboard_rank = 1
 players_list = [[('Zoli74', 2), ('Marci52', 5), ('Jancsi', 1), ('Arhur', 7), ('Levi', 3), ('Arnold', 4), ('Janos', 6), ('Jozsi', 10)],
                 [('Jane', 12), ('Adri', 9), ('Valaki', 11), ('Megvalaki', 20)],
-                [('teszt1', 30), ('teszt2', 40)]]
+                [('teszt1', 30), ('teszt2', 40)]]  # Let uncleared for testing purposes
 players_online_page = 0
 
 player = ''
@@ -42,9 +44,11 @@ player_rank = -1
 enemy_name = 'UN'
 online_players = -1
 
+# Events for the game and rounds
 Closed = threading.Event()
 Ended = threading.Event()
 
+# Events for the PVP mode
 Accepted = threading.Event()
 Got_Inv = threading.Event()
 Refused = threading.Event()
@@ -56,7 +60,7 @@ Wait_For_Request = threading.Event()
 Stopped = threading.Event()
 Canceled = threading.Event()
 
-cb_last_state = False
+cb_last_state = False  # Checkbox previous state for triggering when changes
 
 
 def firstpage():
@@ -107,10 +111,6 @@ def firstpage():
                 client.Connected_To_Server.wait()
             window.close()
             thirdpage()
-        elif event == 'Play as Guest':
-            continue
-            window.close()
-            fourthpage()
     window.close()
 
 
@@ -159,7 +159,7 @@ def secondpage():
             window.close()
             firstpage()
         elif event == 'Login':
-            if not client.Connected_To_Server.is_set():  #Needed connection with the server first!
+            if not client.Connected_To_Server.is_set():  # Needed connection with the server first!
                 psg.popup_ok('Server unreachable!', 'You are not connected to the server!\nCheck your internet connection, and restart the game!')
                 continue
 
@@ -241,7 +241,7 @@ def thirdpage():
             window.close()
             firstpage()
         elif event == 'Register':
-            if not client.Connected_To_Server.is_set():  #Needed connection with the server first!
+            if not client.Connected_To_Server.is_set():  # Needed connection with the server first!
                 psg.popup_ok('Server unreachable!', 'You are not connected to the server!\nCheck your internet connection, and restart the game!')
                 continue
 
@@ -459,15 +459,17 @@ def change_round_icon(round, outcome):  # Ha, az outcome 0 -> lose, ha 1 -> win
 def sixthpage():
     global window, position, hover, prev_hover
     CantPut.clear()
-    if not queue.empty():
+    if not queue.empty():  # Fixes a problem that the queue may not be cleared in some cases in the new round
         answ = ''
         while not queue.empty():
             answ += str(queue.get())
             queue.get()
-        sendError('Warning in pages.py/sixthpage', 'Queue not empty on initializing page!\n'+answ, 0)
+        if DEBUG:
+            sendError('Warning in pages.py/sixthpage', 'Queue not empty on initializing page!\n'+answ, 0)
+
     try:
         roundd = [None, None, None, None]
-        if len(enemy_name) < 7:
+        if len(enemy_name) < 7:  # Smaller font when a name is longer than it is visible
             text1 = psg.Text(text='You ', font=('Algerian', 40), text_color='black', background_color=bgclr)
             text2 = psg.Text(text='vs. ', font=('Algerian', 30), text_color='black', background_color=bgclr)
             text3 = psg.Text(text=f'{enemy_name}', font=('Algerian', 40), text_color='black', background_color=bgclr)
@@ -485,7 +487,8 @@ def sixthpage():
         b7 = psg.Button('', key='-7-', button_color='white', image_filename=root_dir + 'background.png')
         b8 = psg.Button('', key='-8-', button_color='white', image_filename=root_dir + 'background.png')
         b9 = psg.Button('', key='-9-', button_color='white', image_filename=root_dir + 'background.png')
-        if base_game.current_round != 1:
+
+        if base_game.current_round != 1:  # Set up the correct round result indicators(win, loose, or unchecked)
             for i in range(len(round_list)):
                 t = 'roundBlank.png'
                 kei = f'{i}.round'
@@ -500,7 +503,7 @@ def sixthpage():
             roundd[2] = psg.Button('', key='2.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
             roundd[3] = psg.Button('', key='3.round', button_color='white', image_filename=root_dir + 'roundBlank.png')
 
-        im = psg.Image(filename="", key="image")
+        im = psg.Image(filename="", key="image")  # The camera frame
         space1 = psg.Text('', size=(30, 1), background_color=bgclr)
         space2 = psg.Text('', size=(30, 1), background_color=bgclr)
         col1 = [[text1]]
@@ -526,12 +529,13 @@ def sixthpage():
         src = base_game.current_round
         while src == base_game.current_round and not match_ended:
             event, values = window.read(timeout=100)
+
             if base_game.sig:  # Signal for restarting the round when it's TIE
                 base_game.sig = False
                 break
-            position = window.current_location()
+            position = window.current_location()  # Retrieves the window's current location
 
-            if roundend_event.isSet():
+            if roundend_event.isSet():  # Signal for ending a round, and modifying it on the UI
                 roundend_event.clear()
                 r, _ = base_game.check_win()
                 if r != TIE:
@@ -544,22 +548,25 @@ def sixthpage():
                     kei = f'{base_game.current_round}.round'
                     window[kei].update(image_filename=root_dir + 'roundBlank.png')
                     print('updated')
-            # 194, 144
-            if base_recognition.raw_frame is not None:  # Make image if it is initaialized and in use
+
+            # Frame size: 194x144 px
+            if base_recognition.raw_frame is not None:  # Resize image if camera is initaialized and in use
                 base_recognition.raw_frame = cv2.resize(base_recognition.raw_frame, (194, 144))
                 imgbytes = cv2.imencode(".png", base_recognition.raw_frame)[1].tobytes()
                 window["image"].update(data=imgbytes)
 
-            if prev_hover != hover and prev_hover != 0:
+            if prev_hover != hover and prev_hover != 0:  # Coloring the area that is left unhovered
                 tmp = f'-{prev_hover}-'
                 window[tmp].update(button_color='white')
                 pass
-            if Disconnected.is_set():
+
+            if Disconnected.is_set():  # If an enemy disconnects in PVP
                 Disconnected.clear()
                 psg.popup_timed('Enemy disconnected! Returning to menu.',  auto_close_duration=5)
                 window.close()
                 fourthpage()
-            if 0 < hover <= 9:
+
+            if 0 < hover <= 9:  # Colors the hovered area to gray, and performs click event if the gesture is OPEN_PALM
                 tmp = f'-{hover}-'
                 window[tmp].update(button_color='gray')
                 prev_hover = hover
@@ -570,7 +577,8 @@ def sixthpage():
             if event == psg.WIN_CLOSED or event == "Exit":
                 main.stop_program()
                 break
-            if Logout.is_set():
+
+            if Logout.is_set():  # If the server crashes, performs logout
                 Logout.clear()
                 window.close()
                 firstpage()
@@ -581,12 +589,12 @@ def sixthpage():
                 pos = int(raw[0])
                 letter = raw[1]
                 put_on_window(pos, letter)
-            elif not CantPut.is_set():  # If nothing happened, then we check if the player moved on the screen
+            elif not CantPut.is_set():  # If nothing happened, then we check if click event happened on buttons
                 for i in range(1, 10):
                     tmp = f'-{i}-'
                     if event == tmp:
                         if base_game.game_type == GAME_PVE:
-                            request_put(i, PLAYER_ME)  # 3 means will be valid either Player1 or Player2, nor PC
+                            request_put(i, PLAYER_ME)
                         elif base_game.game_type == GAME_SAMEPC:
                             request_put(i, base_game.current_player)
                         elif base_game.game_type == GAME_PVP:

@@ -9,7 +9,7 @@ class colors:
 
 
 def sendError(header, raw_message, level=1):
-    # Header - cimzés,Message - üzenet, Level - fokozat: 0 warning, 1 error, 2 error kilépéssel
+    # Header ,Message , Level : 0 warning, 1 error, 2 error with exiting(NOT IN USE)
     time_format = datetime.datetime.now().strftime("%H:%M:%S")
     msg = f"[{datetime.date.today()} {time_format}] {header} : {raw_message}\n"
 
@@ -24,7 +24,5 @@ def sendError(header, raw_message, level=1):
         log_file = open("./log.txt", "a")
         log_file.write(msg)
         log_file.close()
-    except:
+    except _:
         print("Error in error.py: Cannot write to file!")
-
-    # Kilépés később következik

@@ -1,5 +1,8 @@
 import socket
 
+# CONFIG FILE
+# socket needed for localhost testings
+
 DEBUG = True
 SERVER_PORT = 3356
 SERVER_IP = socket.gethostname()

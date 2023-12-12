@@ -38,19 +38,19 @@ def initialize_camera():
     list_cameras()
 
     if not len(cam_list):
-        sendError('Nincs kamera', 'Nincs észlelve kamera!')
+        sendError('No camera found!', 'No camera found!', 0)
         cam_id = -1
         return True
 
-    cam = cv2.VideoCapture(cam_id)
+    cam = cv2.VideoCapture(cam_id)  # Checking the actual camera(Double check)
 
     if cam is None:
-        sendError("Hiba a kameránál", "Nincs inicializálva a kamera!")
+        sendError("Error opening the cam", "The cam is not initialized, or no camera has been selected!")
         return False
     result, o = cam.read()
 
     if not result:
-        sendError("Hiba a kamera megnyitásánál", "Nem található a kiválasztott kamera, vagy nem lehet megnyitni!")
+        sendError("Error opening the cam", "The cam is not initialized, or couldn't retrieve frame!")
         return False
 
     h, w, _ = o.shape  # Getting the default frame sizes of the camera
@@ -65,7 +65,7 @@ def capture_frame():
         res, frame = cam.read()
 
         if not res and not stop_cam:
-            sendError("Hiba a kamerával", "Megszakadt a kapcsolat a kamerával!")
+            sendError("Error capturing the frame", "The cam disconnected!", 0)
             cam_id = -1
             return False
 
@@ -76,26 +76,28 @@ def process_frame(frame):
     global stop_cam, raw_frame, hand_segm, curr_gesture
 
     try:
-        if stop_cam:
+        if stop_cam:  # Stop flag
             return
+
         cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = cv2.flip(frame, 1)  # Mirroring the camera
         if not show_grid:
-            raw_frame = frame.copy()
+            raw_frame = frame.copy()  # Making a copy for the visualized frame
 
-        rec_img = hands_detector.process(frame)
+        rec_img = hands_detector.process(frame)  # Initiate hand recognizer on the frame
 
-        if rec_img.multi_hand_landmarks:
-            hand_landmarks = rec_img.multi_hand_landmarks[0]
-            curr_gesture, hand_segm = recognize_gesture(hand_landmarks, frame)
-            # print(curr_gesture)
+        if rec_img.multi_hand_landmarks:  # If hand was detected
+            hand_landmarks = rec_img.multi_hand_landmarks[0]  # Take the first hand
+            curr_gesture, hand_segm = recognize_gesture(hand_landmarks, frame)  # Run the gesture recognizer on the fram
         else:
             curr_gesture = 0
-            hand_segm = 0
+            hand_segm = 0  # If no hand was detected, default values
 
-        if show_grid:
+        if show_grid:  # If the player allowed the grids, make a copy of the frame after it was drawed
             raw_frame = frame.copy()
-        cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+        # Visualizing the frame that is used for detections
+        # cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         # h, w = get_cam_size()
         # cv2.resize(frame, (w, h))
         # cv2.imshow("Kep", frame)
@@ -108,7 +110,7 @@ def process_frame(frame):
                               "Something went wrong in process_frame function! " + str(e))
 
 
-def stop_recognition():
+def stop_recognition():  # Stop function for the recognition methods
     global stop_cam
     try:
         stop_cam = True
@@ -125,7 +127,7 @@ def stop_recognition():
                               "Something went wrong in stop_recognition function! " + str(e))
 
 
-def operate_recognition():
+def operate_recognition():  # The initiating of the recognition module
     global hands_detector, camInitialized, stop_cam
 
     stop_cam = False
@@ -137,16 +139,18 @@ def operate_recognition():
         return
     camInitFinished.set()
     camInitialized.set()
+    # Initializing finished
 
-    if cam_id == -1:
+    if cam_id == -1:  # If no camera available
         stop_recognition()
         return
+
     # Start capturing and recognizing
     hands_detector = mp_hands.Hands(max_num_hands=1, min_detection_confidence=detection_confidence,
                                     min_tracking_confidence=tracking_confidence)
     capture_frame()
 
-    # Release resources
+    # Release resources after stopped
     stop_recognition()
 
 
