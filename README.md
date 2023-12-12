@@ -29,11 +29,21 @@ A Match consist of 3 rounds, where a TIE game will be repeated until there is a 
 
 - Python 3.10 or higher
 - PC or Laptop running Linux/Windows OS
--	Stable internet-connection
--	Storage space: 450 MB at least
--	Memory: 512 MB RAM at least
--	Dedicated or Integrated Webcam with a minimum resolution of 480x640 
--	Dedicated or Integrated Graphics Card
+- Stable internet-connection
+- Storage space: 450 MB at least
+- Memory: 512 MB RAM at least
+- Dedicated or Integrated Webcam with a minimum resolution of 480x640 
+- Dedicated or Integrated Graphics Card
+- 
+### Checked minimum requirements
+
+- OS: Windows 10 Pro x64
+- CPU: Intel i3-10110U 
+- GPU: Integrated Intel UHD Graphics
+- Memory: 8 GB RAM
+- Integrated Webcam with a resolution of 1280x720
+- Internet download speed: 60 Mbps 
+
 
 
 ### Installation
