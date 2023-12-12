@@ -110,6 +110,8 @@ Execute the following command in your terminal in your project folder/src:
 - `README.md`: This documentation file.
 - `docs`: Documentations and diagrams.
 
+## For the whole documentation, and descriptions, check the `docs` folder!
+
 # Thank you for reading it!
 
 
