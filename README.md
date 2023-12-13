@@ -52,12 +52,12 @@ A Match consist of 3 rounds, where a TIE game will be repeated until there is a 
 2. Clone the repository:
 
     ```bash
-   git clone https://github.com/DavidArthur2/Tic-Tac-Toe
+   git clone https://github.com/DavidArthur2/Tic-Tac-Toe-demo
     ```
 4. Navigate into the project folder:
    
    ```bash
-   cd Tic-Tac-Toe/src
+   cd Tic-Tac-Toe-demo/src
    ```
 6. To create a virtual environment, run these commands on a terminal(Command Prompt on Windows, and Terminal on Linux):
    
@@ -89,7 +89,7 @@ A Match consist of 3 rounds, where a TIE game will be repeated until there is a 
    ```cd C:\Windows\Fonts```
 3. Paste the following code, where <your_project_folder> should be replaced with the project folder location:
    
-   ```copy "<your_project_folder>/Tic-Tac-Toe/src/UI/fonts/Algerian Regular.ttf"```
+   ```copy "<your_project_folder>/Tic-Tac-Toe-demo/src/UI/fonts/Algerian Regular.ttf"```
 
 ### Running the Game
 
